@@ -1,0 +1,36 @@
+{%  extends 'xxtj/base.html' %}
+{% block base %}
+{% if requery == '0' %}
+    <table border="1" width="90%">
+        <tr>
+            <td colspan="2">请确认以下信息</td>
+        </tr>
+        <tr>
+            <td width="20%">项目</td>
+            <td>{{ statistics }}</td>
+        </tr>
+        <tr>
+            <td>姓名</td>
+            <td>{{ name }}</td>
+        </tr>
+        <tr>
+            <td>
+                <form action="{% url 'xxtj:add' %}">
+                    <input type="submit" value="确认">
+                    <input type="hidden" name="statistics" value="{{ statistics }}">
+                    <input type="hidden" name="name" value="{{ name }}">
+                    {% csrf_token %}
+                    <input type="hidden" name="requery" value="1">
+                </form>
+            </td>
+            <td>
+                <form action="{% url 'xxtj:index' class_id %}">
+                    <input type="submit" value="取消">
+                </form>
+            </td>
+        </tr>
+    </table>
+{% else %}
+#写数据库
+{% endif %}
+{% endblock base %}
