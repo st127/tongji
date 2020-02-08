@@ -1,47 +1,66 @@
 {% extends 'xxtj/base.html' %}
+{% load static from static%}
 {% block head %}
     <script type="text/javascript">
-    function query_by_statistics(str)
+    function query_by_statistics(str) {
+    var xmlhttp;
+    if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
+        xmlhttp = new XMLHttpRequest();
+    } else {// code for IE6, IE5
+        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    xmlhttp.onreadystatechange = function () {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            document.getElementById("shuoming_by_ajax").innerHTML = xmlhttp.responseText;
+        }
+    }
+    xmlhttp.open("GET", "{% url 'xxtj:ajax' %}?statistics=" + str + "&do=query_description_by_statistics", true);
+    xmlhttp.send();
+    }
+    function validateForm()
     {
-        var xmlhttp;
-        if (window.XMLHttpRequest)
-        {// code for IE7+, Firefox, Chrome, Opera, Safari
-            xmlhttp=new XMLHttpRequest();
-        }
-        else
-        {// code for IE6, IE5
-            xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-        }
-        xmlhttp.onreadystatechange=function()
-        {
-            if (xmlhttp.readyState==4 && xmlhttp.status==200)
-            {
-                document.getElementById("shuoming_by_ajax").innerHTML=xmlhttp.responseText;
-            }
-        }
-        xmlhttp.open("GET","{% url 'xxtj:ajax' %}?statistics="+str+"&class_id={{ class_id }}",true);
-        xmlhttp.send();
+    var sta=document.forms["main"]["statistics"].value;
+    var name=document.forms["main"]["name"].value;
+    if (sta=="0"){
+        alert("项目必须选择");
+        return false;
+    }
+    if (name=="0"){
+        alert("姓名必须选择");
+        return false;
+    }
     }
     </script>
 {% endblock head %}
 {% block base %}
-    <form action="{% url 'xxtj:add' %}">
+    <table width="90%">
+      <tr><td align="center">
+	    <span style="font-size: 36px; font-family: Georgia, 'Times New Roman',
+	    Times, serif; font-weight: bold; text-align: center;">信息统计系统</span>
+      </td></tr>
+    </table>
+    <form action="{% url 'xxtj:add' %}" name="main" onsubmit="return validateForm()">
         <table border="1" width="90%">
         	<tr>
-            	<td width="20%"">选择项目</td>
+            	<td width="20%">选择项目</td>
                 <td><select name="statistics" onchange=query_by_statistics(this.value)>
-                    <option></option>
-                    <option value="1">sub_1</option>
-                    <option value="2">sub_2</option>
-                    <option value="3">sub_3</option>
+                    <option value="0"></option>
+                    {% for statistic in statistics %}
+                        <option value="{{statistic.pk}}">{{ statistic.statistics_name }}</option>
+                    {% endfor %}
                 </select></td>
             </tr>
             <tr>
                 <td>选择姓名</td>
                 <td><select name="name">
-                    <option value="1">name_1</option>
-                    <option value="2">name_2</option>
-                    <option value="3">name_3</option>
+                    <option value="0"></option>
+                    {% for name in names %}
+                        <option value="{{ name.pk }}">{{ name.student_name }}</option>
+                    {% endfor %}
+
+{#                    <option value="1">name_1</option>#}
+{#                    <option value="2">name_2</option>#}
+{#                    <option value="3">name_3</option>#}
                 </select></td>
             </tr>
             <tr>

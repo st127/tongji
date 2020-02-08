@@ -7,18 +7,18 @@
         </tr>
         <tr>
             <td width="20%">项目</td>
-            <td>{{ statistics }}</td>
+            <td>{{ statistics.statistics_name }}</td>
         </tr>
         <tr>
             <td>姓名</td>
-            <td>{{ name }}</td>
+            <td>{{ name.student_name }}</td>
         </tr>
         <tr>
             <td>
                 <form action="{% url 'xxtj:add' %}">
                     <input type="submit" value="确认">
-                    <input type="hidden" name="statistics" value="{{ statistics }}">
-                    <input type="hidden" name="name" value="{{ name }}">
+                    <input type="hidden" name="statistics" value="{{ statistics.pk }}">
+                    <input type="hidden" name="name" value="{{ name.pk }}">
                     {% csrf_token %}
                     <input type="hidden" name="requery" value="1">
                 </form>
@@ -31,6 +31,10 @@
         </tr>
     </table>
 {% else %}
-#写数据库
+    {% if success %}
+        添加成功
+    {% else %}
+        添加失败
+    {% endif %}
 {% endif %}
 {% endblock base %}
