@@ -1,40 +1,78 @@
 {%  extends 'xxtj/base.html' %}
+{% block head %}
+    <script type="text/javascript">
+    var xmlhttp = false;
+    function createRequest(url) {
+        if (window.XMLHttpRequest) {
+            xmlhttp = new XMLHttpRequest();
+            if(xmlhttp.overrideMimeType){
+                xmlhttp.overrideMimeType("text/xml");
+            }
+        } else if(window.ActiveXObject) {
+            try{
+                xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+            }catch (e) {
+                try {
+                    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP")
+                }catch (e) {}
+            }
+        }
+        if(!xmlhttp){
+            alert("不能创建xmlhttp实例，请不要使用兼容模式或更换浏览器！")
+            return false;
+        }
+        xmlhttp.onreadystatechange = alertContents;
+        xmlhttp.open("GET", url, true);
+        xmlhttp.send(null);
+    }
+    function alertContents() {
+        var return_obj;
+        if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+            return_obj = JSON.parse(xmlhttp.responseText);
+            if (return_obj.status === "success"){
+                alert("添加成功");
+                go_index();
+            }
+            else{
+                alert("添加失败");
+                go_index();
+            }
+        }
+    }
+    function add_recond(str) {
+        createRequest("{% url 'xxtj:ajax' %}?statistics={{ statistics.pk }}&stu_id={{ name.pk }}&do=add_recond");
+    }
+    function go_index() {
+        window.location.replace("{% url 'xxtj:index' class_id%}");
+    }
+</script>
+{% endblock head %}
 {% block base %}
-{% if requery == '0' %}
-    <table border="1" width="90%">
-        <tr>
-            <td colspan="2">请确认以下信息</td>
-        </tr>
-        <tr>
-            <td width="20%">项目</td>
-            <td>{{ statistics.statistics_name }}</td>
-        </tr>
-        <tr>
-            <td>姓名</td>
-            <td>{{ name.student_name }}</td>
-        </tr>
-        <tr>
-            <td>
-                <form action="{% url 'xxtj:add' %}">
-                    <input type="submit" value="确认">
-                    <input type="hidden" name="statistics" value="{{ statistics.pk }}">
-                    <input type="hidden" name="name" value="{{ name.pk }}">
-                    {% csrf_token %}
-                    <input type="hidden" name="requery" value="1">
-                </form>
-            </td>
-            <td>
-                <form action="{% url 'xxtj:index' class_id %}">
-                    <input type="submit" value="取消">
-                </form>
-            </td>
-        </tr>
-    </table>
-{% else %}
-    {% if success %}
-        添加成功
-    {% else %}
-        添加失败
-    {% endif %}
-{% endif %}
+<table border="1" width="90%">
+    <tr>
+        <td colspan="2">请确认以下信息</td>
+    </tr>
+    <tr>
+        <td width="20%">项目</td>
+        <td>{{ statistics.statistics_name }}</td>
+    </tr>
+    <tr>
+        <td>姓名</td>
+        <td>{{ name.student_name }}</td>
+    </tr>
+    <tr>
+        <td>
+                <input type="button"  onclick="add_recond()" value="确认">
+{#                  <input type="hidden" name="statistics" value="{{ statistics.pk }}">#}
+{#                  <input type="hidden" name="name" value="{{ name.pk }}">#}
+{#                  {% csrf_token %}#}
+            </form>
+        </td>
+        <td>
+{#              <form action="{% url 'xxtj:index' class_id %}">#}
+                <input type="button" onclick="go_index()" value="取消">
+            </form>
+        </td>
+    </tr>
+</table>
 {% endblock base %}

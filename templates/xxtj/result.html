@@ -1,4 +1,111 @@
 {% extends 'xxtj/base.html' %}
+{% block head %}
+    <script type="text/javascript">
+    var xmlhttp = false;
+    function createRequest(url, dothing) {
+        if (window.XMLHttpRequest) {
+            xmlhttp = new XMLHttpRequest();
+            if(xmlhttp.overrideMimeType){
+                xmlhttp.overrideMimeType("text/xml");
+            }
+        } else if(window.ActiveXObject) {
+            try{
+                xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+            }catch (e) {
+                try {
+                    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP")
+                }catch (e) {}
+            }
+        }
+        if(!xmlhttp){
+            alert("不能创建xmlhttp实例，请不要使用兼容模式或更换浏览器！")
+            return false;
+        }
+        if(dothing === "get_sta_inf"){
+            xmlhttp.onreadystatechange = get_sta_inf;
+        }
+        else if(dothing === "clear_responce"){
+            xmlhttp.onreadystatechange = clear_responce;
+        }
+        xmlhttp.open("GET", url, true);
+        xmlhttp.send(null);
+    }
+    function get_sta_inf() {
+        var return_obj;
+        var statistical;
+        var unstatistical;
+        var i;
+        statistical="<table>";
+        unstatistical="<table>";
+        if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+            return_obj = JSON.parse(xmlhttp.responseText);
+            document.getElementById("description").innerHTML=return_obj.description;
+            for (i = 1; i <= return_obj.l_sta; i++){
+                statistical = statistical + return_obj.statistical[i];
+            }
+            statistical = statistical + "</table>"
+            document.getElementById("statistical").innerHTML=statistical;
+
+            for (i = 1; i <= return_obj.l_unsta; i++){
+                unstatistical = unstatistical + return_obj.unstatistical[i];
+            }
+            unstatistical = unstatistical + "</table>"
+            document.getElementById("unstatistical").innerHTML=unstatistical;
+        }
+    }
+    function clear_responce() {
+
+    }
+    function query(str) {
+        if(str === "0"){
+            alert("请选择项目");
+            return false;
+        }
+        createRequest("{% url 'xxtj:ajax' %}?statistics= " + str + "&do=get_result_by_sta", "get_sta_inf");
+    }
+    function clear_() {
+        var statistics=document.getElementById("statistics").value;
+        if(statistics === "0"){
+            alert("请选择项目");
+            return false;
+        }
+        createRequest("{% url 'xxtj:ajax' %}?statistics= " + statistics + "&do=clear_sta", "clear_responces");
+    }
+</script>
+{% endblock head %}
 {% block base %}
-    
+    <table align="center">
+        <tr>
+            <td><span style="font-size: 36px; font-family: Georgia, 'Times New Roman',
+            Times, serif; font-weight: bold; text-align: center;">信息统计结果</span></td>
+        </tr>
+    </table>
+    <table width="90%" border="1">
+        <tr>
+            <td width="20%">选择项目</td>
+            <td>
+                <select name="statistics" onchange="query(this.value)" id="statistics">
+                    <option value="0"></option>
+                    {% for key, value in statistics.items %}
+                        <option value="{{ key }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>说明</td>
+            <td><div id="description"></div></td>
+        </tr>
+        <tr>
+            <td>已提交</td>
+            <td><div id="statistical"></div></td>
+        </tr>
+        <tr>
+            <td>未提交</td>
+            <td><div id="unstatistical"></div></td>
+        </tr>
+        <tr>
+            <td colspan="2"><button onclick="clear_()">清除数据并开始下一次统计</button></td>
+        </tr>
+    </table>
 {% endblock base %}

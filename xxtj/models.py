@@ -40,4 +40,5 @@ class recond(models.Model):
     stu_id = models.IntegerField()
     inf = models.CharField(max_length=10240)
     url = models.CharField(max_length=10240)
+    # add_dt = models.DateTimeField(auto_now_add=True)
     isDelete = models.BooleanField(default=False)
