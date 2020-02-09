@@ -24,8 +24,8 @@
         if(dothing === "get_sta_inf"){
             xmlhttp.onreadystatechange = get_sta_inf;
         }
-        else if(dothing === "clear_responce"){
-            xmlhttp.onreadystatechange = clear_responce;
+        else if(dothing === "clear_response"){
+            xmlhttp.onreadystatechange = clear_response_;
         }
         xmlhttp.open("GET", url, true);
         xmlhttp.send(null);
@@ -53,8 +53,15 @@
             document.getElementById("unstatistical").innerHTML=unstatistical;
         }
     }
-    function clear_responce() {
-
+    function clear_response_() {
+        var return_obj;
+        if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+            return_obj = JSON.parse(xmlhttp.responseText);
+            if (return_obj.status === "success") {
+                alert("数据清除成功！");
+                location.reload();
+            }
+        }
     }
     function query(str) {
         if(str === "0"){
@@ -69,7 +76,10 @@
             alert("请选择项目");
             return false;
         }
-        createRequest("{% url 'xxtj:ajax' %}?statistics= " + statistics + "&do=clear_sta", "clear_responces");
+        createRequest("{% url 'xxtj:ajax' %}?statistics= " + statistics + "&do=clear_sta", "clear_response");
+    }
+    function add_description() {
+        window.location.replace("{% url 'xxtj:result'%}" + "?admin_id={{ admin_id }}&do=add_description");
     }
 </script>
 {% endblock head %}
@@ -105,7 +115,10 @@
             <td><div id="unstatistical"></div></td>
         </tr>
         <tr>
-            <td colspan="2"><button onclick="clear_()">清除数据并开始下一次统计</button></td>
+            <td colspan="2">
+                <button onclick="clear_()">清除数据并开始下一次统计</button>
+                <button onclick="add_description()">统计添加/修改说明</button>
+            </td>
         </tr>
     </table>
 {% endblock base %}

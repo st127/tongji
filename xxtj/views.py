@@ -51,19 +51,50 @@ def ajax(request):
     if do == 'clear_sta':
         statistics = int(request.GET.get('statistics'));
         return clear_sta(statistics)
+    if do == 'add_description':
+        json = request.GET.get('json');
+        return add_description(json)
 
 
 def result(request):
     admin_id = request.GET.get('admin_id')
+    do = request.GET.get('do')
     if admin_id is None:
-        return render(request, 'xxtj/result.html')
-    else:
+        return render(request, 'xxtj/result.html', {
+            'title': "统计结果",
+        })
+    elif do is None:
         adm_sta = admin_information.objects.filter(isDelete=False).get(pk=int(admin_id))
         adm_sta = adm_sta.admin_statistics_set.all()
         statistics = {}
         for items in adm_sta:
-            statistics[items.statistics.pk] = items.statistics.statistics_description
+            statistics[items.statistics.pk] = str(items.statistics.statistics_class.pk) + "班" + items.statistics.statistics_name
         # print(statistics)
         return render(request, 'xxtj/result.html', {
             'statistics': statistics,
+            'title': "统计结果",
+            'admin_id': admin_id,
         })
+    elif do == "get_result_by_sta":
+        adm_sta = admin_information.objects.filter(isDelete=False).get(pk=int(admin_id))
+        adm_sta = adm_sta.admin_statistics_set.all()
+        statistics = {}
+        for items in adm_sta:
+            statistics[items.statistics.pk] = str(items.statistics.statistics_class.pk) + "班" + items.statistics.statistics_name
+        return render(request, 'xxtj/result_add_description.html', {
+            'admin_id': admin_id,
+            'statistics': statistics,
+        })
+    elif do == "add_description":
+        adm_sta = admin_information.objects.filter(isDelete=False).get(pk=int(admin_id))
+        adm_sta = adm_sta.admin_statistics_set.all()
+        statistics = {}
+        for items in adm_sta:
+            statistics[items.statistics.pk] = str(
+                items.statistics.statistics_class.pk) + "班" + items.statistics.statistics_name
+        return render(request, 'xxtj/add_description.html', {
+            'statistics': statistics,
+            'admin_id': admin_id,
+        })
+        pass
+

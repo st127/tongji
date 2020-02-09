@@ -1,5 +1,7 @@
 from ..models import *
 from django.http import HttpResponse, JsonResponse
+import json
+
 from django.shortcuts import render
 import json
 
@@ -53,8 +55,8 @@ def get_result_by_sta(statistics):
         if items.pk not in stu_reconded:
             l_unsta = l_unsta + 1
             stu_unstatistical[l_unsta] = "<tr><td>" + stu_inf_all.filter(isDelete=False).get(pk=items.pk).student_name + "</tr></td>"
-    print(stu_statistical)
-    print(stu_unstatistical)
+    # print(stu_statistical)
+    # print(stu_unstatistical)
     sent_dic = {
         'description': sta.statistics_description,
         'l_sta': l_sta,
@@ -71,4 +73,14 @@ def clear_sta(statistics):
     for items in reconds:
         items.isDelete = True
         items.save()
+    return JsonResponse({'status': 'success'})
+
+
+def add_description(json_str):
+    json_str = json.loads(json_str)
+    # json_str['description']
+    for item in json_str['statistics']:
+        sta_inf = statistics_information.objects.get(pk=item)
+        sta_inf.statistics_description = json_str['description']
+        sta_inf.save()
     return JsonResponse({'status': 'success'})

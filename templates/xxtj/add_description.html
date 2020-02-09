@@ -1,0 +1,74 @@
+{% extends 'xxtj/base.html' %}
+{% block head %}
+    <script language="JavaScript">
+        var xmlhttp = false;
+        function createRequest(url) {
+            if (window.XMLHttpRequest) {
+                xmlhttp = new XMLHttpRequest();
+                if(xmlhttp.overrideMimeType){
+                    xmlhttp.overrideMimeType("text/xml");
+                }
+            } else if(window.ActiveXObject) {
+                try{
+                    xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+                }catch (e) {
+                    try {
+                        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP")
+                    }catch (e) {}
+                }
+            }
+            if(!xmlhttp){
+                alert("不能创建xmlhttp实例，请不要使用兼容模式或更换浏览器！")
+                return false;
+            }
+            xmlhttp.onreadystatechange = alertContents;
+            xmlhttp.open("GET", url, true);
+            xmlhttp.send(null);
+        }
+        function alertContents() {
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                var return_obj;
+                if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+                    return_obj = JSON.parse(xmlhttp.responseText);
+                    if (return_obj.status === "success") {
+                        alert("添加成功！");
+                    }
+        }
+            }
+        }
+        function add_description() {
+            var obj = document.getElementsByName("statistics");
+            var description=document.getElementById("description").value;
+            var json = {"do":"add_description","description":description};
+            var check_val = [];
+            for (var i = 0; i < obj.length; i++) {
+                if (obj[i].checked) {
+                    check_val.push(obj[i].value);
+                    {#alert(obj[i].value);#}
+                }
+            }
+            json["statistics"] = check_val;
+            var json_str = JSON.stringify(json);
+            createRequest("{% url 'xxtj:ajax' %}?do=add_description&admin_id={{ admin_id }}&json=" + json_str);
+        }
+    </script>
+{% endblock head %}
+{% block base %}
+    <table width="90%" border="1">
+        <tr>
+            <td width="20%">请选择您要添加的统计项目</td>
+            <td>
+            {% for key, value in statistics.items %}
+                <input type="checkbox" name="statistics" value="{{ key }}">{{ value }}
+            {% endfor %}
+            </td>
+        </tr>
+        <tr>
+            <td>请写下您要添加的说明</td>
+            <td><textarea name="description" id="description" cols="30" rows="10"></textarea></td>
+        </tr>
+        <tr>
+            <td colspan="2"><input type="button" onclick="add_description()" value="提交"></td>
+        </tr>
+    </table>
+{% endblock base %}

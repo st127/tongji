@@ -6,6 +6,7 @@ from django.db import models
 
 class class_information(models.Model):
     person_num = models.IntegerField()
+    # name_dis = models.CharField(max_length=50) ---->views.py    def result   字典
     isDelete = models.BooleanField(default=False)
 
 
