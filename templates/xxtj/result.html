@@ -68,7 +68,7 @@
             alert("请选择项目");
             return false;
         }
-        createRequest("{% url 'xxtj:ajax' %}?statistics= " + str + "&do=get_result_by_sta", "get_sta_inf");
+        createRequest("{% url 'xxtj:ajax' %}?statistics=" + str + "&do=get_result_by_sta", "get_sta_inf");
     }
     function clear_() {
         var statistics=document.getElementById("statistics").value;

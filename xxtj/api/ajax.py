@@ -80,7 +80,7 @@ def add_description(json_str):
     json_str = json.loads(json_str)
     # json_str['description']
     for item in json_str['statistics']:
-        sta_inf = statistics_information.objects.get(pk=item)
-        sta_inf.statistics_description = json_str['description']
+        sta_inf = statistics_information.objects.filter(isDelete=False).get(pk=item)
+        sta_inf.statistics_description = str(json_str['description']).replace('\n', '<br>')
         sta_inf.save()
     return JsonResponse({'status': 'success'})

@@ -6,7 +6,7 @@ from django.db import models
 
 class class_information(models.Model):
     person_num = models.IntegerField()
-    # name_dis = models.CharField(max_length=50) ---->views.py    def result   字典
+    name_dis = models.CharField(max_length=50)
     isDelete = models.BooleanField(default=False)
 
 
@@ -39,7 +39,9 @@ class recond(models.Model):
     student = models.ForeignKey("student_information", on_delete=models.CASCADE)
     statistics = models.ForeignKey("statistics_information", on_delete=models.CASCADE)
     stu_id = models.IntegerField()
-    inf = models.CharField(max_length=10240)
-    url = models.CharField(max_length=10240)
-    # add_dt = models.DateTimeField(auto_now_add=True)
+    inf = models.TextField()
+    url = models.TextField()
+    add_dt = models.DateTimeField(auto_now_add=True)
+    del_dt = models.DateTimeField(auto_now=True)
+    del_adm = models.ForeignKey("admin_information", on_delete=models.CASCADE)
     isDelete = models.BooleanField(default=False)

@@ -14,8 +14,9 @@ def index(request, class_id):
     classes = class_information.objects.filter(isDelete=False).get(pk=class_id)
     names = classes.student_information_set.all()
     return render(request, 'xxtj/index.html', {
-        'title': 'index',
+        'title': str(classes.pk) + "班" + '信息统计系统',
         'class_id': class_id,
+        'class_name': str(classes.pk) + "班",
         'statistics': statistics,
         'names': names,
     })
@@ -25,8 +26,8 @@ def add(request):
     statistics = request.GET.get('statistics')
     name = request.GET.get('name')
     class_id = request.GET.get('class_id')
-    statistics = statistics_information.objects.get(pk=statistics)
-    name = student_information.objects.get(pk=name)
+    statistics = statistics_information.objects.filter(isDelete=False).get(pk=statistics)
+    name = student_information.objects.filter(isDelete=False).get(pk=name)
     return render(request, 'xxtj/add.html', {
         'statistics': statistics,
         'name': name,
@@ -65,7 +66,7 @@ def result(request):
         })
     elif do is None:
         adm_sta = admin_information.objects.filter(isDelete=False).get(pk=int(admin_id))
-        adm_sta = adm_sta.admin_statistics_set.all()
+        adm_sta = adm_sta.admin_statistics_set.filter(isDelete=False).all()
         statistics = {}
         for items in adm_sta:
             statistics[items.statistics.pk] = str(items.statistics.statistics_class.pk) + "班" + items.statistics.statistics_name
@@ -77,23 +78,26 @@ def result(request):
         })
     elif do == "get_result_by_sta":
         adm_sta = admin_information.objects.filter(isDelete=False).get(pk=int(admin_id))
-        adm_sta = adm_sta.admin_statistics_set.all()
+        adm_sta = adm_sta.admin_statistics_set.filter(isDelete=False).all()
         statistics = {}
         for items in adm_sta:
+
             statistics[items.statistics.pk] = str(items.statistics.statistics_class.pk) + "班" + items.statistics.statistics_name
         return render(request, 'xxtj/result_add_description.html', {
             'admin_id': admin_id,
+            'title': "统计结果",
             'statistics': statistics,
         })
     elif do == "add_description":
         adm_sta = admin_information.objects.filter(isDelete=False).get(pk=int(admin_id))
-        adm_sta = adm_sta.admin_statistics_set.all()
+        adm_sta = adm_sta.admin_statistics_set.filter(isDelete=False).all()
         statistics = {}
         for items in adm_sta:
             statistics[items.statistics.pk] = str(
                 items.statistics.statistics_class.pk) + "班" + items.statistics.statistics_name
         return render(request, 'xxtj/add_description.html', {
             'statistics': statistics,
+            'title': "添加说明",
             'admin_id': admin_id,
         })
         pass
