@@ -1,7 +1,5 @@
 from ..models import *
 from django.http import HttpResponse, JsonResponse
-import json
-
 from django.shortcuts import render
 import json
 
@@ -29,6 +27,7 @@ def add_recond(statistics, stu_id):
         recond_inf.stu_id = int(stu_id)
         recond_inf.inf = 'null'
         recond_inf.url = 'null'
+        # recond_inf.del_adm = Null
     recond_inf.save()
     stat = {
         'status': 'success',
@@ -47,14 +46,28 @@ def get_result_by_sta(statistics):
     stu_reconded =[]
     l_sta = 0
     l_unsta = 0
+    for_bit = 0
     for items in reconds:
         l_sta = l_sta + 1
-        stu_statistical[l_sta] = "<tr><td>" + stu_inf_all.filter(isDelete=False).get(pk=items.stu_id).student_name + "</tr></td>"
-        stu_reconded.append(items.stu_id)
+        for_bit = for_bit + 1
+        if for_bit % 2 == 1:
+            stu_statistical[l_sta] = "<tr><td>" + stu_inf_all.filter(isDelete=False).get(pk=items.stu_id).student_name + "</tr></td>"
+            stu_reconded.append(items.stu_id)
+        else:
+            stu_statistical[l_sta] = '<tr class="success"><td>' + stu_inf_all.filter(isDelete=False).get(
+                pk=items.stu_id).student_name + "</tr></td>"
+            stu_reconded.append(items.stu_id)
+    for_bit = 0
     for items in stu_inf_all:
         if items.pk not in stu_reconded:
-            l_unsta = l_unsta + 1
-            stu_unstatistical[l_unsta] = "<tr><td>" + stu_inf_all.filter(isDelete=False).get(pk=items.pk).student_name + "</tr></td>"
+            for_bit = for_bit + 1
+            if for_bit % 2 == 1:
+                l_unsta = l_unsta + 1
+                stu_unstatistical[l_unsta] = "<tr><td>" + stu_inf_all.filter(isDelete=False).get(pk=items.pk).student_name + "</tr></td>"
+            else:
+                l_unsta = l_unsta + 1
+                stu_unstatistical[l_unsta] = '<tr class="warning"><td>' + stu_inf_all.filter(isDelete=False).get(
+                    pk=items.pk).student_name + "</tr></td>"
     # print(stu_statistical)
     # print(stu_unstatistical)
     sent_dic = {

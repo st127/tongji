@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from .models import *
 from .api.ajax import *
-from .api import ajax
+from django.contrib.auth.hashers import make_password, check_password
 
 
 # Create your views here.
@@ -32,7 +32,7 @@ def add(request):
         'statistics': statistics,
         'name': name,
         'class_id': class_id,
-        })
+    })
 
 
 def ajax(request):
@@ -69,7 +69,8 @@ def result(request):
         adm_sta = adm_sta.admin_statistics_set.filter(isDelete=False).all()
         statistics = {}
         for items in adm_sta:
-            statistics[items.statistics.pk] = str(items.statistics.statistics_class.pk) + "班" + items.statistics.statistics_name
+            statistics[items.statistics.pk] = str(
+                items.statistics.statistics_class.pk) + "班" + items.statistics.statistics_name
         # print(statistics)
         return render(request, 'xxtj/result.html', {
             'statistics': statistics,
@@ -81,8 +82,8 @@ def result(request):
         adm_sta = adm_sta.admin_statistics_set.filter(isDelete=False).all()
         statistics = {}
         for items in adm_sta:
-
-            statistics[items.statistics.pk] = str(items.statistics.statistics_class.pk) + "班" + items.statistics.statistics_name
+            statistics[items.statistics.pk] = str(
+                items.statistics.statistics_class.pk) + "班" + items.statistics.statistics_name
         return render(request, 'xxtj/result_add_description.html', {
             'admin_id': admin_id,
             'title': "统计结果",
@@ -95,10 +96,28 @@ def result(request):
         for items in adm_sta:
             statistics[items.statistics.pk] = str(
                 items.statistics.statistics_class.pk) + "班" + items.statistics.statistics_name
-        return render(request, 'xxtj/add_description.html', {
+        return render(request, 'xxtj/admin/add_description.html', {
             'statistics': statistics,
             'title': "添加说明",
             'admin_id': admin_id,
         })
         pass
 
+
+def login(request):
+    admin_id = request.GET.get('admin_id')
+    do = request.POST.get('do')
+    if do == "verify":
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        token = request.POST.get('token')
+        admin_info = admin_information.objects.filter(isDelete=False).get(admin_username=username)
+        if check_password(password,admin_info.admin_password):
+            pass
+    if admin_id is None:
+        username = ''
+    else:
+        username = admin_information.objects.filter(isDelete=False).get(pk=admin_id).admin_username
+    return render(request, 'xxtj/login.html', {
+        "username": username,
+    })

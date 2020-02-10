@@ -48,17 +48,17 @@
 </script>
 {% endblock head %}
 {% block base %}
-<table border="1" width="90%">
+<table class="table table-bordered" width="90%">
     <tr>
-        <td colspan="2">请确认以下信息</td>
+        <td colspan="2"><h2>请确认以下信息</h2></td>
+    </tr>
+    <tr class="success">
+        <td width="30%"><h4><strong>项目</strong></h4></td>
+        <td><h5><strong>{{ statistics.statistics_name }}</strong></h5></td>
     </tr>
     <tr>
-        <td width="20%">项目</td>
-        <td>{{ statistics.statistics_name }}</td>
-    </tr>
-    <tr>
-        <td>姓名</td>
-        <td>{{ name.student_name }}</td>
+        <td><h4><strong>姓名</strong></h4></td>
+        <td><h5><strong>{{ name.student_name }}</strong></h5></td>
     </tr>
     <tr>
         <td>

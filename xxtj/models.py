@@ -26,6 +26,7 @@ class statistics_information(models.Model):
 class admin_information(models.Model):
     admin_username = models.CharField(max_length=50)
     admin_password = models.CharField(max_length=100)
+    # token = models.CharField(max_length=50)
     isDelete = models.BooleanField(default=False)
 
 
@@ -43,5 +44,5 @@ class recond(models.Model):
     url = models.TextField()
     add_dt = models.DateTimeField(auto_now_add=True)
     del_dt = models.DateTimeField(auto_now=True)
-    del_adm = models.ForeignKey("admin_information", on_delete=models.CASCADE)
+    # del_adm = models.ForeignKey("admin_information", on_delete=models.CASCADE)
     isDelete = models.BooleanField(default=False)

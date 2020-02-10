@@ -9,4 +9,5 @@ urlpatterns = [
     path('add/', views.add, name='add'),
     path('result/', views.result, name='result'),
     path('ajax/', views.ajax, name='ajax'),
+    path('login/', views.login, name='login'),
 ]

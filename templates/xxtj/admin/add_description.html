@@ -51,6 +51,9 @@
             var json_str = JSON.stringify(json);
             createRequest("{% url 'xxtj:ajax' %}?do=add_description&admin_id={{ admin_id }}&json=" + json_str);
         }
+        function go_result() {
+        window.location.replace("{% url 'xxtj:result' %}?admin_id={{ admin_id }}");
+    }
     </script>
 {% endblock head %}
 {% block base %}
@@ -68,7 +71,10 @@
             <td><textarea name="description" id="description" cols="30" rows="10"></textarea></td>
         </tr>
         <tr>
-            <td colspan="2"><input type="button" onclick="add_description()" value="提交"></td>
+            <td colspan="2">
+                <input type="button" onclick="add_description()" value="提交">
+                <input type="button" onclick="go_result()"value="返回">
+            </td>
         </tr>
     </table>
 {% endblock base %}

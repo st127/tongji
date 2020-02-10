@@ -42,58 +42,80 @@
     }
     function validateForm()
     {
-    var sta=document.forms["main"]["statistics"].value;
-    var name=document.forms["main"]["name"].value;
-    if (sta=="0"){
-        alert("项目必须选择");
-        return false;
-    }
-    if (name=="0"){
-        alert("姓名必须选择");
-        return false;
-    }
+        var sta=document.forms["main"]["statistics"].value;
+        var name=document.forms["main"]["name"].value;
+        if (sta=="0"){
+            alert("项目必须选择");
+            return false;
+        }
+        if (name=="0"){
+            alert("姓名必须选择");
+            return false;
+        }
     }
     </script>
 {% endblock head %}
-{% block base %}
-    <table width="90%">
-      <tr><td align="center">
-	    <span style="font-size: 36px; font-family: Georgia, 'Times New Roman',
-	    Times, serif; font-weight: bold; text-align: center;">信息统计系统</span>
-      </td></tr>
-    </table>
-    <form action="{% url 'xxtj:add' %}" name="main" onsubmit="return validateForm()">
-        <table border="1" width="90%">
-        	<tr>
-            	<td width="20%">选择项目</td>
-                <td><select name="statistics" onchange=query_by_statistics(this.value)>
-                    <option value="0"></option>
-                    {% for statistic in statistics %}
-                        <option value="{{statistic.pk}}">{{ statistic.statistics_name }}</option>
-                    {% endfor %}
-                </select></td>
-            </tr>
-            <tr>
-                <td>选择姓名</td>
-                <td><select name="name">
-                    <option value="0"></option>
-                    {% for name in names %}
-                        <option value="{{ name.pk }}">{{ name.student_name }}</option>
-                    {% endfor %}
 
-{#                    <option value="1">name_1</option>#}
-{#                    <option value="2">name_2</option>#}
-{#                    <option value="3">name_3</option>#}
-                </select></td>
-            </tr>
-            <tr>
-                <td>说明</td>
-                <td><span id="shuoming_by_ajax"></span></td>
-            </tr>
-            <tr>
-                <td>提交</td>
-                <td><input type="submit" value="提交"></td>
-            </tr>
+
+{% block base %}
+    <div class="container">
+       <div class="row clearfix">
+           <div class="col-md-6 column">
+               <div class="jumbotron" >
+                   <h1>
+                       信息统计系统
+                   </h1>
+
+{#                   <p>#}
+{#                        <a class="btn btn-primary btn-large" href="#">Learn more</a>#}
+{#                   </p>#}
+               </div>
+           </div>
+       </div>
+   </div>
+    <form action="{% url 'xxtj:add' %}" name="main" onsubmit="return validateForm()">
+        <table width="90%" class="table table-borderedc">
+{#            <thead>#}
+{#					<tr>#}
+{#						<th>#}
+{##}
+{#						</th>#}
+{#						<th>#}
+{##}
+{#						</th>#}
+{#            </thead>#}
+            <tbody>
+                <tr>
+                    <td width="30%"><h4><strong>选择项目</strong></h4></td>
+                    <td><select name="statistics" onchange=query_by_statistics(this.value)>
+                        <option value="0"></option>
+                        {% for statistic in statistics %}
+                            <option value="{{statistic.pk}}">{{ statistic.statistics_name }}</option>
+                        {% endfor %}
+                    </select></td>
+                </tr>
+                <tr class="success">
+                    <td><h4><strong>选择姓名</strong></h4></td>
+                    <td><select name="name">
+                        <option value="0"></option>
+                        {% for name in names %}
+                            <option value="{{ name.pk }}">{{ name.student_name }}</option>
+                        {% endfor %}
+
+    {#                    <option value="1">name_1</option>#}
+    {#                    <option value="2">name_2</option>#}
+    {#                    <option value="3">name_3</option>#}
+                    </select></td>
+                </tr>
+                <tr>
+                    <td><h4><strong>说明</strong></h4></td>
+                    <td><span id="shuoming_by_ajax"></span></td>
+                </tr>
+                <tr class="success">
+                    <td><h4><strong>提交</strong></h4></td>
+                    <td><input type="submit" class="btn btn-default" value="提交"></td>
+                </tr>
+            </tbody>
         </table>
         {% csrf_token %}
         <input type="hidden" name="class_id" value="{{ class_id }}">
