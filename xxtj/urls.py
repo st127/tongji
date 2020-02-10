@@ -10,4 +10,5 @@ urlpatterns = [
     path('result/', views.result, name='result'),
     path('ajax/', views.ajax, name='ajax'),
     path('login/', views.login, name='login'),
+    path('advance/', views.advance, name='advance'),
 ]

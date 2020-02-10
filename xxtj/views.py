@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from .models import *
 from .api.ajax import *
 from django.contrib.auth.hashers import make_password, check_password
+import hashlib
 
 
 # Create your views here.
@@ -14,9 +15,9 @@ def index(request, class_id):
     classes = class_information.objects.filter(isDelete=False).get(pk=class_id)
     names = classes.student_information_set.all()
     return render(request, 'xxtj/index.html', {
-        'title': str(classes.pk) + "班" + '信息统计系统',
+        'title': str(classes.name_dis) + '信息统计系统',
         'class_id': class_id,
-        'class_name': str(classes.pk) + "班",
+        'class_name': str(classes.name_dis),
         'statistics': statistics,
         'names': names,
     })
@@ -70,7 +71,7 @@ def result(request):
         statistics = {}
         for items in adm_sta:
             statistics[items.statistics.pk] = str(
-                items.statistics.statistics_class.pk) + "班" + items.statistics.statistics_name
+                items.statistics.statistics_class.name_dis) + items.statistics.statistics_name
         # print(statistics)
         return render(request, 'xxtj/result.html', {
             'statistics': statistics,
@@ -83,7 +84,7 @@ def result(request):
         statistics = {}
         for items in adm_sta:
             statistics[items.statistics.pk] = str(
-                items.statistics.statistics_class.pk) + "班" + items.statistics.statistics_name
+                items.statistics.statistics_class.name_dis) + items.statistics.statistics_name
         return render(request, 'xxtj/result_add_description.html', {
             'admin_id': admin_id,
             'title': "统计结果",
@@ -95,7 +96,7 @@ def result(request):
         statistics = {}
         for items in adm_sta:
             statistics[items.statistics.pk] = str(
-                items.statistics.statistics_class.pk) + "班" + items.statistics.statistics_name
+                items.statistics.statistics_class.name_dis) + items.statistics.statistics_name
         return render(request, 'xxtj/admin/add_description.html', {
             'statistics': statistics,
             'title': "添加说明",
@@ -113,7 +114,11 @@ def login(request):
         token = request.POST.get('token')
         admin_info = admin_information.objects.filter(isDelete=False).get(admin_username=username)
         if check_password(password,admin_info.admin_password):
-            pass
+            responnse = render(request, 'xxtj/admin/advanced.html', {
+
+            })
+
+            responnse.set_cookie('token',value="")
     if admin_id is None:
         username = ''
     else:
@@ -121,3 +126,7 @@ def login(request):
     return render(request, 'xxtj/login.html', {
         "username": username,
     })
+
+
+def advance(request):
+    pass

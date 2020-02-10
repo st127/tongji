@@ -30,7 +30,9 @@
                         <a class="navbar-brand">信息统计系统</a>
                     </div>
                     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                        <ul class="nav navbar-nav">
+                        {% block daohanglan %}
+                        {% endblock daohanglan %}
+{#                        <ul class="nav navbar-nav">#}
 {#                            <li class="active">#}
 {#                                 <a href="#">Link</a>#}
 {#                            </li>#}
@@ -61,7 +63,7 @@
 {#                                    </li>#}
 {#                                </ul>#}
 {#                            </li>#}
-                        </ul>
+{#                        </ul>#}
                         <ul class="nav navbar-nav navbar-right">
                             <li>
                                  <a href="{% url 'xxtj:login' %}">后台登录</a>

@@ -1,6 +1,7 @@
 from ..models import *
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render
+from django.utils import timezone
+from pytz import timezone
 import json
 
 
@@ -17,6 +18,7 @@ def add_recond(statistics, stu_id):
         recond_inf.statistics = statistics_information.objects.get(pk=statistics)
         recond_inf.student = student_information.objects.filter(isDelete=False).get(pk=stu_id)
         recond_inf.stu_id = int(stu_id)
+        recond_inf.add_dt = timezone.now()
         recond_inf.inf = 'null'
         recond_inf.url = 'null'
     else:
@@ -25,9 +27,9 @@ def add_recond(statistics, stu_id):
         recond_inf.statistics = statistics_information.objects.filter(isDelete=False).get(pk=statistics)
         recond_inf.student = student_information.objects.filter(isDelete=False).get(pk=stu_id)
         recond_inf.stu_id = int(stu_id)
+        recond_inf.add_dt = timezone.now()
         recond_inf.inf = 'null'
         recond_inf.url = 'null'
-        # recond_inf.del_adm = Null
     recond_inf.save()
     stat = {
         'status': 'success',
@@ -43,7 +45,7 @@ def get_result_by_sta(statistics):
     # print(stu_inf_all)
     stu_statistical = {}
     stu_unstatistical = {}
-    stu_reconded =[]
+    stu_reconded = []
     l_sta = 0
     l_unsta = 0
     for_bit = 0
@@ -51,11 +53,12 @@ def get_result_by_sta(statistics):
         l_sta = l_sta + 1
         for_bit = for_bit + 1
         if for_bit % 2 == 1:
-            stu_statistical[l_sta] = "<tr><td>" + stu_inf_all.filter(isDelete=False).get(pk=items.stu_id).student_name + "</tr></td>"
+            stu_statistical[l_sta] = "<tr><td>" + stu_inf_all.filter(isDelete=False).get(
+                pk=items.stu_id).student_name + str(items.add_dt.astimezone(timezone('Asia/Shanghai'))) + "</tr></td>"
             stu_reconded.append(items.stu_id)
         else:
             stu_statistical[l_sta] = '<tr class="success"><td>' + stu_inf_all.filter(isDelete=False).get(
-                pk=items.stu_id).student_name + "</tr></td>"
+                pk=items.stu_id).student_name + str(items.add_dt.astimezone(timezone('Asia/Shanghai'))) + "</tr></td>"
             stu_reconded.append(items.stu_id)
     for_bit = 0
     for items in stu_inf_all:
@@ -63,7 +66,8 @@ def get_result_by_sta(statistics):
             for_bit = for_bit + 1
             if for_bit % 2 == 1:
                 l_unsta = l_unsta + 1
-                stu_unstatistical[l_unsta] = "<tr><td>" + stu_inf_all.filter(isDelete=False).get(pk=items.pk).student_name + "</tr></td>"
+                stu_unstatistical[l_unsta] = "<tr><td>" + stu_inf_all.filter(isDelete=False).get(
+                    pk=items.pk).student_name + "</tr></td>"
             else:
                 l_unsta = l_unsta + 1
                 stu_unstatistical[l_unsta] = '<tr class="warning"><td>' + stu_inf_all.filter(isDelete=False).get(

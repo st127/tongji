@@ -26,7 +26,8 @@ class statistics_information(models.Model):
 class admin_information(models.Model):
     admin_username = models.CharField(max_length=50)
     admin_password = models.CharField(max_length=100)
-    # token = models.CharField(max_length=50)
+    token = models.CharField(max_length=50)
+    level = models.IntegerField()
     isDelete = models.BooleanField(default=False)
 
 
@@ -42,7 +43,13 @@ class recond(models.Model):
     stu_id = models.IntegerField()
     inf = models.TextField()
     url = models.TextField()
-    add_dt = models.DateTimeField(auto_now_add=True)
-    del_dt = models.DateTimeField(auto_now=True)
-    # del_adm = models.ForeignKey("admin_information", on_delete=models.CASCADE)
+    add_dt = models.DateTimeField()
+    isDelete = models.BooleanField(default=False)
+
+
+class admin_request(models.Model):
+    request_admin = models.ForeignKey("admin_information", on_delete=models.CASCADE)
+    date = models.DateTimeField(auto_now_add=True)
+    request = models.TextField()
+    isVerify = models.BooleanField(default=False)
     isDelete = models.BooleanField(default=False)
