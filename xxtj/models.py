@@ -45,11 +45,3 @@ class recond(models.Model):
     url = models.TextField()
     add_dt = models.DateTimeField()
     isDelete = models.BooleanField(default=False)
-
-
-class admin_request(models.Model):
-    request_admin = models.ForeignKey("admin_information", on_delete=models.CASCADE)
-    date = models.DateTimeField(auto_now_add=True)
-    request = models.TextField()
-    isVerify = models.BooleanField(default=False)
-    isDelete = models.BooleanField(default=False)

@@ -27,6 +27,9 @@
         else if(dothing === "clear_response"){
             xmlhttp.onreadystatechange = clear_response_;
         }
+        else if(dothing === "check_token"){
+            xmlhttp.onreadystatechange = check_token;
+        }
         xmlhttp.open("GET", url, true);
         xmlhttp.send(null);
     }
@@ -79,7 +82,7 @@
         createRequest("{% url 'xxtj:ajax' %}?statistics= " + statistics + "&do=clear_sta", "clear_response");
     }
     function add_description() {
-        window.location.replace("{% url 'xxtj:result'%}" + "?admin_id={{ admin_id }}&do=add_description");
+        window.location.href="{% url 'xxtj:result'%}" + "?admin_id={{ admin_id }}&do=add_description";
     }
     function setCookie(cname, cvalue, exdays) {
         var d = new Date();
@@ -115,12 +118,22 @@
     function advanced() {
         var token;
         if (getQueryVariable("admin_id") != false) {
-            if (token = getCookie("token") != "") {
-                createRequest("{% url 'xxtj:ajax' %}do=check_login_token&admin_id={{ admin_id }}&token=" + token)
+            if ((token = getCookie("token")) != "") {
+                createRequest("{% url 'xxtj:ajax' %}?do=check_login_token&admin_id={{ admin_id }}&token=" + token, "check_token")
             }
             else{
                 alert("请先登录");
-                window.location.replace("{% url 'xxtj:login' %}?admin_id={{ admin_id }}&goto=result_advanced");
+                window.location.href="{% url 'advance:login' %}?admin_id={{ admin_id }}&goto=result_advanced";
+            }
+        }
+    }
+    function check_token() {
+        var return_obj;
+        if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+            return_obj = JSON.parse(xmlhttp.responseText);
+            if(return_obj.status === "true"){
+                setCookie("admin_id", "{{ admin_id }}", 365)
+                window.location.href="{% url 'advance:index'%}";
             }
         }
     }

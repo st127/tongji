@@ -1,6 +1,6 @@
 from ..models import *
 from django.http import HttpResponse, JsonResponse
-from django.utils import timezone
+from django.utils import timezone as d_tz
 from pytz import timezone
 import json
 
@@ -18,7 +18,7 @@ def add_recond(statistics, stu_id):
         recond_inf.statistics = statistics_information.objects.get(pk=statistics)
         recond_inf.student = student_information.objects.filter(isDelete=False).get(pk=stu_id)
         recond_inf.stu_id = int(stu_id)
-        recond_inf.add_dt = timezone.now()
+        recond_inf.add_dt = d_tz.now()
         recond_inf.inf = 'null'
         recond_inf.url = 'null'
     else:
@@ -27,7 +27,7 @@ def add_recond(statistics, stu_id):
         recond_inf.statistics = statistics_information.objects.filter(isDelete=False).get(pk=statistics)
         recond_inf.student = student_information.objects.filter(isDelete=False).get(pk=stu_id)
         recond_inf.stu_id = int(stu_id)
-        recond_inf.add_dt = timezone.now()
+        recond_inf.add_dt = d_tz.now()
         recond_inf.inf = 'null'
         recond_inf.url = 'null'
     recond_inf.save()
@@ -101,3 +101,15 @@ def add_description(json_str):
         sta_inf.statistics_description = str(json_str['description']).replace('\n', '<br>')
         sta_inf.save()
     return JsonResponse({'status': 'success'})
+
+
+def check_login_token(token, admin_id):
+    sta_inf = admin_information.objects.filter(isDelete=False).get(pk=admin_id)
+    if token == sta_inf.token:
+        return JsonResponse({
+            'status': 'true',
+        })
+    else:
+        return JsonResponse({
+            'status': 'false',
+        })

@@ -1,8 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import *
 from .api.ajax import *
 from django.contrib.auth.hashers import make_password, check_password
+from pytz import timezone
 import hashlib
 
 
@@ -56,6 +57,11 @@ def ajax(request):
     if do == 'add_description':
         json = request.GET.get('json');
         return add_description(json)
+    if do == 'check_login_token':
+        admin_id = request.GET.get('admin_id')
+        token = request.GET.get('token')
+        return  check_login_token(token, admin_id)
+
 
 
 def result(request):
@@ -105,28 +111,7 @@ def result(request):
         pass
 
 
-def login(request):
-    admin_id = request.GET.get('admin_id')
-    do = request.POST.get('do')
-    if do == "verify":
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        token = request.POST.get('token')
-        admin_info = admin_information.objects.filter(isDelete=False).get(admin_username=username)
-        if check_password(password,admin_info.admin_password):
-            responnse = render(request, 'xxtj/admin/advanced.html', {
-
-            })
-
-            responnse.set_cookie('token',value="")
-    if admin_id is None:
-        username = ''
-    else:
-        username = admin_information.objects.filter(isDelete=False).get(pk=admin_id).admin_username
-    return render(request, 'xxtj/login.html', {
-        "username": username,
-    })
 
 
-def advance(request):
-    pass
+
+

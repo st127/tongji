@@ -1,7 +1,8 @@
 from django.urls import path
-from django.urls import include
+
 from . import views
-app_name = 'xxtj';
+
+app_name = 'xxtj'
 urlpatterns = [
     # path('', views.index, name='index'),
     # path('', views.index, name='index'),
@@ -9,6 +10,4 @@ urlpatterns = [
     path('add/', views.add, name='add'),
     path('result/', views.result, name='result'),
     path('ajax/', views.ajax, name='ajax'),
-    path('login/', views.login, name='login'),
-    path('advance/', views.advance, name='advance'),
 ]
