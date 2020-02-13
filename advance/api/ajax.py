@@ -140,8 +140,9 @@ def edit_sta_ajax(request):
                                                    statistics=statistics_information.objects.get(pk=sta_id))
                 obj.isDelete = False
             except admin_statistics.DoesNotExist:
-                obj = admin_statistics(admin=admin_information.objects.get(pk=item.admin.pk),
-                                       statistics=statistics_information.objects.get(pk=sta_id))
+                obj = admin_statistics()
+                obj.admin = admin_information.objects.get(pk=item.admin.pk)
+                obj.statistics = sta_inf
             obj.save()
         else:
             obj = admin_statistics.objects.get(admin=admin_information.objects.get(pk=item.admin.pk),
