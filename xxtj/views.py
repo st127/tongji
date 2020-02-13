@@ -12,7 +12,7 @@ import hashlib
 
 def index(request, class_id):
     # return HttpResponse("This is index")
-    statistics = statistics_information.objects.filter(statistics_class=class_id)
+    statistics = statistics_information.objects.filter(isDelete=False).filter(statistics_class=class_id)
     classes = class_information.objects.filter(isDelete=False).get(pk=class_id)
     names = classes.student_information_set.all()
     return render(request, 'xxtj/index.html', {
@@ -55,7 +55,7 @@ def ajax(request):
         statistics = int(request.GET.get('statistics'));
         return clear_sta(statistics)
     if do == 'add_description':
-        json = request.GET.get('json');
+        json = request.GET.get('json')
         return add_description(json)
     if do == 'check_login_token':
         admin_id = request.GET.get('admin_id')

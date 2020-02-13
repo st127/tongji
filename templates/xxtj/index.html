@@ -31,6 +31,28 @@
             document.getElementById("shuoming_by_ajax").innerHTML = xmlhttp.responseText;
         }
     }
+        function setCookie(cname, cvalue, exdays) {
+        var d = new Date();
+        d.setTime(d.getTime() + (exdays*24*60*60*1000));
+        var expires = "expires="+ d.toUTCString();
+        document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+        {#document.cookie = cname + "=" + cvalue + ";" + ";path=/";#}
+    }
+    function getCookie(cname) {
+        var name = cname + "=";
+        var decodedCookie = decodeURIComponent(document.cookie);
+        var ca = decodedCookie.split(';');
+        for(var i = 0; i <ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+             }
+             if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+             }
+         }
+        return "";
+    }
     function query_by_statistics(str) {
         if(str=="0"){
             window.alert("请在 选择项目 中选择您要进行提交的项目");
@@ -52,6 +74,12 @@
             alert("姓名必须选择");
             return false;
         }
+        setCookie("stu_id", name, 365);
+    }
+    window.onload=function () {
+        var stu_id = getCookie("stu_id");
+        if( stu_id!= "")
+            document.forms["main"]["name"].value=stu_id;
     }
     </script>
 {% endblock head %}

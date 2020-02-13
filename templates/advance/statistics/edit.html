@@ -5,7 +5,16 @@
     {
         var name=document.forms["form"]["statistics_name"].value;
         var description = document.forms['form']["statistics_description"].value;
-        var class_id=document.forms["form"]["statistics_class"].value;
+        var class_id = document.forms["form"]["statistics_class"].value;
+        var obj = document.forms["form"]["adm_sta"];
+        var json = {"description":description};
+        var check_val = [];
+        for (var i = 0; i < obj.length; i++) {
+            if (obj[i].checked) {
+                check_val.push(obj[i].value);
+            }
+            json["admin_id"] = check_val;
+        }
         if (name==""){
             alert("必须填写统计名");
             return false;
@@ -18,7 +27,12 @@
             alert("必须选择班级");
             return false;
         }
-        createRequest("{% url 'advance:ajax' %}?do=edit_sta&sta={{ sta_inf.pk }}&sta_des="+description+"&sta_name="+name+"&class_id="+class_id)
+        json["sta"]={{ sta_inf.pk }};
+        json["sta_des"]=description;
+        json["sta_name"]=name;
+        json["class_id"]=class_id;
+        var json_str = JSON.stringify(json);
+        createRequest("{% url 'advance:ajax' %}?do=edit_sta&json=" + json_str);
     }
     var xmlhttp = false;
     function createRequest(url) {
@@ -100,6 +114,17 @@
 
                         </select>
 					</div>
+				</div>
+				<div class="form-group">
+					 <label for="sta_admin" class="col-sm-2 control-label">管理用户</label>
+					<div class="col-sm-10">
+                            {% for item in adm_inf %}
+                                {%if item.pk == admin_id %}
+                                    <input id="adm_sta" type="checkbox" value="{{ item.pk }}" disabled checked>{{ item.admin_username }}<br>
+                                {% else %}
+                                    <input id="adm_sta" type="checkbox" value="{{ item.pk }}">{{ item.admin_username }}<br>
+                                {% endif %}
+                            {% endfor %}</div>
 				</div>
 				<div class="form-group">
 					<div class="col-sm-offset-2 col-sm-10">

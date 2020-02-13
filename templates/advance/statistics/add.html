@@ -5,7 +5,17 @@
     {
         var name=document.forms["form"]["statistics_name"].value;
         var description = document.forms['form']["statistics_description"].value;
-        var class_id=document.forms["form"]["statistics_class"].value;
+        var class_id = document.forms["form"]["statistics_class"].value;
+        var obj = document.forms["form"]["adm_sta"];
+        var json = {"do":"add_sta","description":description};
+        var check_val = [];
+        for (var i = 0; i < obj.length; i++) {
+            if (obj[i].checked) {
+                check_val.push(obj[i].value);
+                alert(obj[i].value);
+            }
+            json["admin_id"] = check_val;
+        }
         if (name==""){
             alert("必须填写统计名");
             return false;
@@ -18,7 +28,11 @@
             alert("必须选择班级");
             return false;
         }
-        createRequest("{% url 'advance:ajax' %}?do=add_sta&sta_name="+name+"&sta_des="+description+"&class_id="+class_id)
+        json["sta_name"]=name;
+        json["sta_des"]=description;
+        json["class_id"]=class_id;
+        var json_str = JSON.stringify(json);
+        createRequest("{% url 'advance:ajax' %}?do=add_sta&json="+json_str);
     }
     var xmlhttp = false;
     function createRequest(url) {
@@ -93,8 +107,22 @@
                             {% for item in class_inf %}
                                 <option value="{{ item.pk }}">{{ item.name_dis }}</option>
                             {% endfor %}
-
                         </select>
+					</div>
+				</div>
+				<div class="form-group">
+					 <label for="sta_admin" class="col-sm-2 control-label">管理用户</label>
+					<div class="col-sm-10">
+{#                        <select class="form-control" id="sta_admin">#}
+{#                            <input type="checkbox" naem value="0">#}
+                            {% for item in adm_inf %}
+                                {%if item.pk == admin_id %}
+                                    <input id="adm_sta" type="checkbox" value="{{ item.pk }}" disabled checked>{{ item.admin_username }}<br>
+                                {% else %}
+                                    <input id="adm_sta" type="checkbox" value="{{ item.pk }}">{{ item.admin_username }}<br>
+                                {% endif %}
+                            {% endfor %}
+{#                        </select>#}
 					</div>
 				</div>
 				<div class="form-group">
