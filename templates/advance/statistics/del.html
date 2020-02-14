@@ -43,6 +43,9 @@
             }
             else{
                 alert("删除失败");
+                if(return_obj.dis){
+                    alert(return_obj.dis);
+                }
                 window.location.replace("{% url 'advance:sta_inf'%}");
             }
         }
@@ -68,7 +71,7 @@
 				</p>
 				<p>
 					 <a class="btn btn-large btn-lg btn-danger" onclick="validateForm()">删除</a>
-					 <a class="btn btn-large btn-lg btn-primary" onclick="window.location.href='{% url 'advance:cla_inf' %}'">取消</a>
+					 <a class="btn btn-large btn-lg btn-primary" onclick="window.location.href='{% url 'advance:sta_inf' %}'">取消</a>
 				</p>
 			</div>
 		</div>

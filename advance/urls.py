@@ -19,5 +19,7 @@ urlpatterns = [
     path('del_sta/', views.del_sta, name='del_sta'),
     path('edit_sta/', views.edit_sta, name='edit_sta'),
     # path('adm_ind/', views.adm_ind, name='adm_inf'),
+    path('personal/', views.personal, name='personal'),
+    path('change_password', views.change_password, name='change_password'),
     path('ajax/', views.ajax, name='ajax')
 ]

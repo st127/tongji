@@ -102,7 +102,7 @@
        </div>
    </div>
     <form action="{% url 'xxtj:add' %}" name="main" onsubmit="return validateForm()">
-        <table width="90%" class="table table-borderedc">
+        <table width="90%" class="table table-striped">
 {#            <thead>#}
 {#					<tr>#}
 {#						<th>#}
@@ -122,7 +122,7 @@
                         {% endfor %}
                     </select></td>
                 </tr>
-                <tr class="success">
+                <tr>
                     <td><h4><strong>选择姓名</strong></h4></td>
                     <td><select name="name">
                         <option value="0"></option>
@@ -139,7 +139,7 @@
                     <td><h4><strong>说明</strong></h4></td>
                     <td><span id="shuoming_by_ajax"></span></td>
                 </tr>
-                <tr class="success">
+                <tr>
                     <td><h4><strong>提交</strong></h4></td>
                     <td><input type="submit" class="btn btn-default" value="提交"></td>
                 </tr>
@@ -147,6 +147,5 @@
         </table>
         {% csrf_token %}
         <input type="hidden" name="class_id" value="{{ class_id }}">
-        <input type="hidden" name="requery" value="0">
     </form>
 {% endblock base %}

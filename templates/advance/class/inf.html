@@ -22,7 +22,7 @@
 						<th>人数</th>
                         <th>学生信息</th>
                         <th>统计信息</th>
-						<th >操作</th>
+						<th>操作</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -36,6 +36,7 @@
                         <td>
                             <a href="{% url 'advance:edit_cla' %}?class={{ item.pk }}">修改 </a>
                             <a href="{% url 'advance:del_cla' %}?class={{ item.pk }}"> 删除</a>
+                            <a href="{% url 'xxtj:index' item.pk %}">获取入口</a>
                         </td>
                 {% endfor %}
 

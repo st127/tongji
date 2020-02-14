@@ -24,6 +24,12 @@ def edit_cla_ajax(request):
 
 
 def del_class_ajax(request):
+    admin_inf = admin_information.objects.filter().get(pk=request.COOKIES.get('admin_id'))
+    if admin_inf.level < 100:
+        return JsonResponse({
+            'status': 'failure',
+            'dis': "权限不够！",
+        })
     cla = class_information.objects.filter(isDelete=False).get(pk=request.GET.get('class_id'))
     cla.isDelete = True
     cla.save()
@@ -33,6 +39,8 @@ def del_class_ajax(request):
         item.save()
     sta = cla.statistics_information_set.all()
     for item in sta:
+        item.isDelete = True
+        item.save()
         rec = item.recond_set.all()
         for foo in rec:
             foo.isDelete = True
@@ -56,6 +64,12 @@ def add_stu_ajax(request):
 
 
 def del_stu_ajax(request):
+    admin_inf = admin_information.objects.filter().get(pk=request.COOKIES.get('admin_id'))
+    if admin_inf.level < 100:
+        return JsonResponse({
+            'status': 'failure',
+            'dis': "权限不够！",
+        })
     stu_id = request.GET.get('stu_id')
     stu_inf = student_information.objects.filter(isDelete=False).get(pk=stu_id)
     stu_inf.isDelete = True
@@ -84,11 +98,18 @@ def add_sta_ajax(request):
     sta_inf.statistics_description = json_str["description"]
     sta_inf.statistics_class = class_information.objects.filter(isDelete=False).get(pk=json_str["class_id"])
     sta_inf.save()
-    for admin_id in json_str["admin_id"]:
-        adm_sta = admin_statistics()
-        adm_sta.admin = admin_information.objects.filter(isDelete=False).get(pk=admin_id)
-        adm_sta.statistics = sta_inf
-        adm_sta.save()
+    admin_id = []
+    for item in json_str['admin_id']:
+        admin_id.append(admin_information.objects.filter(isDelete=False).get(pk=item))
+    for item in admin_id:
+        try:
+            obj = admin_statistics.objects.get(admin=item, statistics=sta_inf)
+            obj.isDelete = False
+        except admin_statistics.DoesNotExist:
+            obj = admin_statistics()
+            obj.admin = item
+            obj.statistics = sta_inf
+        obj.save()
     return JsonResponse({
         'status': 'success',
     })
@@ -105,8 +126,17 @@ def add_description(json_str):
 
 
 def del_sta_ajax(request):
+    admin_id = request.COOKIES.get('admin_id')
     sta_id = request.GET.get('sta_id')
     sta_inf = statistics_information.objects.filter(isDelete=False).get(pk=sta_id)
+    admin_id_list = []
+    for item in admin_statistics.objects.filter(statistics=sta_inf).filter(isDelete=False):
+        admin_id_list.append(item.admin.pk)
+    if int(admin_id) not in admin_id_list:
+        return JsonResponse({
+            'status': 'failure',
+            'dis': "您不是此统计的管理员",
+        })
     sta_inf.isDelete = True
     sta_inf.save()
     rec_inf = sta_inf.recond_set.all()
@@ -123,31 +153,44 @@ def del_sta_ajax(request):
 
 
 def edit_sta_ajax(request):
+    admin_id = request.COOKIES.get('admin_id')
     json_obj = request.GET.get('json')
     json_str = json.loads(json_obj)
     sta_id = json_str['sta']
     sta_inf = statistics_information.objects.filter(isDelete=False).get(pk=sta_id)
+    admin_id_list = []
+    for item in admin_statistics.objects.filter(statistics=sta_inf).filter(isDelete=False):
+        admin_id_list.append(item.admin.pk)
+    if int(admin_id) not in admin_id_list:
+        return JsonResponse({
+            'status': 'failure',
+            'dis': '您不是此统计的管理员',
+        })
     sta_inf.statistics_name = json_str['sta_name']
     sta_inf.statistics_description = json_str['sta_des']
     sta_inf.student_class = class_information.objects.filter(isDelete=False).get(pk=json_str["class_id"])
     sta_inf.save()
-    adm_sta = sta_inf.admin_statistics_set.filter(isDelete=False).all()
-    for item in adm_sta:
-        print(item.admin)
-        if item.admin.pk in json_str['admin_id']:
+    admin_sta = admin_information.objects.filter(isDelete=False).all()
+    admin_id = []
+    for item in json_str['admin_id']:
+        admin_id.append(int(item))
+    for item in admin_sta:
+        # print(item.admin)
+        if item.pk in admin_id:
             try:
-                obj = admin_statistics.objects.get(admin=admin_information.objects.get(pk=item.admin.pk),
-                                                   statistics=statistics_information.objects.get(pk=sta_id))
+                obj = admin_statistics.objects.get(admin=item, statistics=sta_inf)
                 obj.isDelete = False
             except admin_statistics.DoesNotExist:
                 obj = admin_statistics()
-                obj.admin = admin_information.objects.get(pk=item.admin.pk)
+                obj.admin = item
                 obj.statistics = sta_inf
             obj.save()
         else:
-            obj = admin_statistics.objects.get(admin=admin_information.objects.get(pk=item.admin.pk),
-                                                     statistics=statistics_information.objects.get(pk=sta_id))
-            obj.isDelete = True
+            try:
+                obj = admin_statistics.objects.get(admin=item, statistics=sta_inf)
+                obj.isDelete = True
+            except admin_statistics.DoesNotExist:
+                pass
             obj.save()
     return JsonResponse({
         'status': 'success',

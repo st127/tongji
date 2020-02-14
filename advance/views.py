@@ -9,6 +9,13 @@ from .api.ajax import *
 
 # Create your views here.
 
+def is_admin_authority(admin_id):
+    if admin_information.objects.filter(isDelete=False).get(pk=admin_id).level <100:
+        return 0
+    else:
+        return 1
+
+
 
 def login(request):
     admin_id = request.GET.get('admin_id')
@@ -47,9 +54,10 @@ def index(request):
     admin_id = request.COOKIES.get('admin_id')
     token = request.COOKIES.get('token')
     admin_inf = admin_information.objects.filter(isDelete=False).get(pk=admin_id)
+
     if admin_inf.token == token:
         return render(request, 'advance/index.html', {
-
+            'admin_Authority': is_admin_authority(admin_id),
         })
     else:
         return redirect('xxtj:login')
@@ -66,11 +74,13 @@ def cla_inf(request):
         # print(class_inf)
         return render(request, 'advance/class/inf.html', {
             'cla_inf': class_inf,
+            'admin_Authority': is_admin_authority(admin_id),
         })
     if cla_id:
         class_inf = class_information.objects.filter(isDelete=False).get(pk=cla_id)
         return render(request, 'advance/class/inf.html', {
             'cla_inf': [class_inf],
+            'admin_Authority': is_admin_authority(admin_id),
         })
     if admin_id:
         adm_inf = admin_information.objects.filter(isDelete=False).get(pk=admin_id)
@@ -79,6 +89,7 @@ def cla_inf(request):
         class_inf = class_information.objects.filter(isDelete=False).all()
         return render(request, 'advance/class/inf.html', {
             'cla_inf': class_inf,
+            'admin_Authority': is_admin_authority(admin_id),
         })
     else:
         return redirect('advance:login')
@@ -92,7 +103,9 @@ def add_cla(request):
         if adm_inf.token != token:
             return redirect('advance:login')
         # class_inf = class_information.objects.filter(isDelete=False).all()
-        return render(request, 'advance/class/add.html')
+        return render(request, 'advance/class/add.html', {
+            'admin_Authority': is_admin_authority(admin_id),
+        })
     else:
         return redirect('advance:login')
 
@@ -112,6 +125,7 @@ def del_cla(request):
             'class': class_inf,
             'stu_inf': stu_inf,
             'sta_inf': sta_inf,
+            'admin_Authority': is_admin_authority(admin_id),
         })
     else:
         return redirect('advance:login')
@@ -126,6 +140,7 @@ def edit_cla(request):
         return render(request, 'advance/class/inf.html', {
             'cla_inf': class_inf,
             'inf': "请选择班级以修改",
+            'admin_Authority': is_admin_authority(admin_id),
         })
     if admin_id:
         adm_inf = admin_information.objects.filter(isDelete=False).get(pk=admin_id)
@@ -134,6 +149,7 @@ def edit_cla(request):
         class_inf = class_information.objects.filter(isDelete=False).get(pk=class_id)
         return render(request, 'advance/class/edit.html', {
             'cla_inf': class_inf,
+            'admin_Authority': is_admin_authority(admin_id),
         })
     else:
         return redirect('advance:login')
@@ -149,6 +165,7 @@ def stu_inf(request):
         return render(request, 'advance/student/inf.html', {
             'stu_inf': stu_inf,
             'inf': "以下是" + cla_inf.name_dis + "的学生",
+            'admin_Authority': is_admin_authority(admin_id),
         })
     if admin_id:
         adm_inf = admin_information.objects.filter(isDelete=False).get(pk=admin_id)
@@ -157,6 +174,7 @@ def stu_inf(request):
         stu_inf = student_information.objects.filter(isDelete=False).all()
         return render(request, 'advance/student/inf.html', {
             'stu_inf': stu_inf,
+            'admin_Authority': is_admin_authority(admin_id),
         })
     else:
         return redirect('advance:login')
@@ -172,6 +190,7 @@ def add_stu(request):
         class_inf = class_information.objects.filter(isDelete=False).all()
         return render(request, 'advance/student/add.html', {
             'class_inf': class_inf,
+            'admin_Authority': is_admin_authority(admin_id),
         })
     else:
         return redirect('advance:login')
@@ -190,6 +209,7 @@ def del_stu(request):
         return render(request, 'advance/student/del.html', {
             'stu_inf': stu_inf,
             'rec_inf': rec_inf,
+            'admin_Authority': is_admin_authority(admin_id),
         })
     else:
         return redirect('advance:login')
@@ -204,6 +224,7 @@ def edit_stu(request):
         return render(request, 'advance/student/inf.html', {
             'stu_inf': stu_inf,
             'inf': "请选择学生以编辑",
+            'admin_Authority': is_admin_authority(admin_id),
         })
     if admin_id:
         adm_inf = admin_information.objects.filter(isDelete=False).get(pk=admin_id)
@@ -216,6 +237,7 @@ def edit_stu(request):
             'stu_inf': stu_inf,
             'class_inf': class_inf,
             'stu_cla': stu_cla,
+            'admin_Authority': is_admin_authority(admin_id),
         })
     else:
         return redirect('advance:login')
@@ -231,6 +253,7 @@ def sta_inf(request):
         return render(request, 'advance/statistics/inf.html', {
             'sta_inf': sta_inf,
             'inf': "以下是" + cla_inf.name_dis + "的统计",
+            'admin_Authority': is_admin_authority(admin_id),
         })
     if admin_id:
         adm_inf = admin_information.objects.filter(isDelete=False).get(pk=admin_id)
@@ -239,6 +262,7 @@ def sta_inf(request):
         sta_inf = statistics_information.objects.filter(isDelete=False).all()
         return render(request, 'advance/statistics/inf.html', {
             'sta_inf': sta_inf,
+            'admin_Authority': is_admin_authority(admin_id),
         })
     else:
         return redirect('advance:login')
@@ -251,12 +275,13 @@ def add_sta(request):
         adm_inf = admin_information.objects.filter(isDelete=False).get(pk=admin_id)
         if adm_inf.token != token:
             return redirect('advance:login')
-        adm_inf = admin_information.objects.filter(isDelete=False).all()
+        admin_inf = admin_information.objects.filter(isDelete=False).all()
         class_inf = class_information.objects.filter(isDelete=False).all()
         return render(request, 'advance/statistics/add.html', {
             'class_inf': class_inf,
             'admin_inf': admin_inf,
             'admin_id': int(admin_id),
+            'admin_Authority': is_admin_authority(admin_id),
         })
     else:
         return redirect('advance:login')
@@ -275,6 +300,7 @@ def del_sta(request):
         return render(request, 'advance/statistics/del.html', {
             'sta_inf': sta_inf,
             'rec_inf': rec_inf,
+            'admin_Authority': is_admin_authority(admin_id),
         })
     else:
         return redirect('advance:login')
@@ -289,6 +315,7 @@ def edit_sta(request):
         return render(request, 'advance/statistics/inf.html', {
             'sta_inf': sta_inf,
             'inf': "请选择统计以编辑",
+            'admin_Authority': is_admin_authority(admin_id),
         })
     if admin_id:
         adm_inf = admin_information.objects.filter(isDelete=False).get(pk=admin_id)
@@ -298,12 +325,56 @@ def edit_sta(request):
         class_inf = class_information.objects.filter(isDelete=False).all()
         sta_cla = sta_inf.statistics_class.pk
         admin_inf = admin_information.objects.all()
+        admin_list = sta_inf.admin_statistics_set.filter(isDelete=False).all()
+        admin_id_list = []
+        for item in admin_list:
+            admin_id_list.append(int(item.admin.pk))
         return render(request, 'advance/statistics/edit.html', {
             'sta_inf': sta_inf,
             'class_inf': class_inf,
             'sta_cla': sta_cla,
             'admin_inf': admin_inf,
             'admin_id': int(admin_id),
+            'admin_id_list': admin_id_list,
+            'admin_Authority': is_admin_authority(admin_id),
+        })
+    else:
+        return redirect('advance:login')
+
+
+def personal(request):
+    admin_id = request.COOKIES.get('admin_id')
+    token = request.COOKIES.get('token')
+    if admin_id:
+        adm_inf = admin_information.objects.filter(isDelete=False).get(pk=admin_id)
+        if adm_inf.token != token:
+            return redirect('advance:login')
+        # class_inf = class_information.objects.filter(isDelete=False).all()
+        return render(request, 'advance/account/personal.html', {
+            'admin_Authority': is_admin_authority(admin_id),
+            'adm_inf': adm_inf,
+        })
+    else:
+        return redirect('advance:login')
+
+
+def change_password(request):
+    admin_id = request.COOKIES.get('admin_id')
+    token = request.COOKIES.get('token')
+    do = request.POST.get('do')
+    if do == "verify":
+        adm_inf = admin_information.objects.filter(isDelete=False).get(pk=admin_id)
+        if check_password(request.POST.get('old_passwd'), adm_inf.admin_password):
+            adm_inf.admin_password = make_password(request.POST.get('new_passwd'))
+            adm_inf.save()
+    if admin_id:
+        adm_inf = admin_information.objects.filter(isDelete=False).get(pk=admin_id)
+        if adm_inf.token != token:
+            return redirect('advance:login')
+        # class_inf = class_information.objects.filter(isDelete=False).all()
+        return render(request, 'advance/account/change_password.html', {
+            'admin_Authority': is_admin_authority(admin_id),
+            'adm_inf': adm_inf,
         })
     else:
         return redirect('advance:login')
