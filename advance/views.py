@@ -255,7 +255,7 @@ def add_sta(request):
         class_inf = class_information.objects.filter(isDelete=False).all()
         return render(request, 'advance/statistics/add.html', {
             'class_inf': class_inf,
-            'adm_inf': adm_inf,
+            'admin_inf': admin_inf,
             'admin_id': int(admin_id),
         })
     else:
@@ -302,7 +302,7 @@ def edit_sta(request):
             'sta_inf': sta_inf,
             'class_inf': class_inf,
             'sta_cla': sta_cla,
-            'adm_inf': admin_inf,
+            'admin_inf': admin_inf,
             'admin_id': int(admin_id),
         })
     else:

@@ -118,7 +118,7 @@
 				<div class="form-group">
 					 <label for="sta_admin" class="col-sm-2 control-label">管理用户</label>
 					<div class="col-sm-10">
-                            {% for item in adm_inf %}
+                            {% for item in admin_inf %}
                                 {%if item.pk == admin_id %}
                                     <input id="adm_sta" type="checkbox" value="{{ item.pk }}" disabled checked>{{ item.admin_username }}<br>
                                 {% else %}
