@@ -386,7 +386,117 @@ def change_password(request):
 
 
 def account_console(request):
-    pass
+    admin_id = request.COOKIES.get('admin_id')
+    token = request.COOKIES.get('token')
+    if admin_id:
+        adm_inf = admin_information.objects.filter(isDelete=False).get(pk=admin_id)
+        if adm_inf.token != token:
+            return redirect('advance:login')
+        if adm_inf.level < 100:
+            return HttpResponse("您的权限不够！")
+        all_adm_inf = admin_information.objects.filter(isDelete=False).all()
+        sta_inf = statistics_information.objects.filter(isDelete=False).all()
+        sta_inf_all = []
+        for item in sta_inf:
+            foo = {
+                'pk': item.pk,
+                'name': item.statistics_name,
+                'class': item.statistics_class.name_dis,
+            }
+            sta_inf_all.append(foo)
+        return render(request, 'advance/account/console.html', {
+            'admin_Authority': is_admin_authority(admin_id),
+            'adm_inf': adm_inf,
+            'all_adm_inf': all_adm_inf,
+            'all_sta_inf': sta_inf_all,
+        })
+    else:
+        return redirect('advance:login')
+
+
+def account_console_add_admin(request):
+    admin_id = request.COOKIES.get('admin_id')
+    token = request.COOKIES.get('token')
+    if admin_id:
+        adm_inf = admin_information.objects.filter(isDelete=False).get(pk=admin_id)
+        if adm_inf.token != token:
+            return redirect('advance:login')
+        if adm_inf.level < 100:
+            return HttpResponse("您的权限不够！")
+        if request.POST.get('do') == 'add_adm':
+            admin_inf = admin_information()
+            admin_inf.admin_username = request.POST.get('username')
+            admin_inf.admin_password = make_password(request.POST.get('password'))
+            if request.POST.get('is_sa') == '1':
+                admin_inf.level = 100
+            else:
+                admin_inf.level = 50
+            admin_inf.save()
+            return render(request, 'advance/account/admin/add.html', {
+                'admin_Authority': is_admin_authority(admin_id),
+                'dis': "添加成功！",
+            })
+        return render(request, 'advance/account/admin/add.html', {
+            'admin_Authority': is_admin_authority(admin_id),
+        })
+
+    else:
+        return redirect('advance:login')
+
+
+def account_console_del_admin(request):
+    admin_id = request.COOKIES.get('admin_id')
+    token = request.COOKIES.get('token')
+    adm_id = request.GET.get('adm_id')
+    if admin_id:
+        adm_inf = admin_information.objects.filter(isDelete=False).get(pk=admin_id)
+        if adm_inf.token != token:
+            return redirect('advance:login')
+        if adm_inf.level < 100:
+            return HttpResponse("您的权限不够！")
+        admin_inf = admin_information.objects.filter(isDelete=False).get(pk=adm_id)
+        return render(request, 'advance/account/admin/del.html', {
+            'admin_Authority': is_admin_authority(admin_id),
+            'adm_inf': admin_inf,
+        })
+
+    else:
+        return redirect('advance:login')
+
+
+def account_console_edit_admin(request):
+    admin_id = request.COOKIES.get('admin_id')
+    token = request.COOKIES.get('token')
+    if admin_id:
+        adm_inf = admin_information.objects.filter(isDelete=False).get(pk=admin_id)
+        if adm_inf.token != token:
+            return redirect('advance:login')
+        if adm_inf.level < 100:
+            return HttpResponse("您的权限不够！")
+        return render(request, 'advance/account/admin/edit.html', {
+            'admin_Authority': is_admin_authority(admin_id),
+        })
+
+    else:
+        return redirect('advance:login')
+
+
+def account_console_result(request):
+    admin_id = request.COOKIES.get('admin_id')
+    token = request.COOKIES.get('token')
+    if admin_id:
+        adm_inf = admin_information.objects.filter(isDelete=False).get(pk=admin_id)
+        if adm_inf.token != token:
+            return redirect('advance:login')
+        if adm_inf.level < 100:
+            return HttpResponse("您的权限不够！")
+        return render(request, 'advance/account/admin/add.html', {
+            'admin_Authority': is_admin_authority(admin_id),
+        })
+
+    else:
+        return redirect('advance:login')
+
 
 
 def ajax(request):
@@ -409,3 +519,5 @@ def ajax(request):
         return del_sta_ajax(request)
     if do == 'edit_sta':
         return edit_sta_ajax(request)
+    if do == 'account_del_adm':
+        return account_del_adm_ajax(request);

@@ -22,5 +22,9 @@ urlpatterns = [
     path('personal/', views.personal, name='personal'),
     path('change_password', views.change_password, name='change_password'),
     path('account_console/', views.account_console, name='account_console'),
+    path('account_console/add_admin/', views.account_console_add_admin, name='account_console.add_admin'),
+    path('account_console/del_admin/', views.account_console_del_admin, name='account_console.del_admin'),
+    path('account_console/edit_admin/', views.account_console_edit_admin, name='account_console.edit_admin'),
+    path('account_console/result/', views.account_console_result, name='account_console.result'),
     path('ajax/', views.ajax, name='ajax')
 ]

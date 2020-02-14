@@ -195,3 +195,17 @@ def edit_sta_ajax(request):
     return JsonResponse({
         'status': 'success',
     })
+
+
+def account_del_adm_ajax(request):
+    adm_id = request.GET.get('adm_id')
+    adm_inf = admin_information.objects.filter(isDelete=False).get(pk=adm_id)
+    adm_inf.isDelete = True
+    adm_inf.save()
+    adm_sta_inf = adm_inf.admin_statistics_set.all()
+    for item in adm_sta_inf:
+        item.isDelete = True
+        item.save()
+    return JsonResponse({
+        'status': 'success',
+    })
