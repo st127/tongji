@@ -367,6 +367,11 @@ def change_password(request):
         if check_password(request.POST.get('old_passwd'), adm_inf.admin_password):
             adm_inf.admin_password = make_password(request.POST.get('new_passwd'))
             adm_inf.save()
+        return render(request, 'advance/account/change_password.html', {
+            'admin_Authority': is_admin_authority(admin_id),
+            'adm_inf': adm_inf,
+            "status": "success",
+        })
     if admin_id:
         adm_inf = admin_information.objects.filter(isDelete=False).get(pk=admin_id)
         if adm_inf.token != token:
@@ -378,6 +383,10 @@ def change_password(request):
         })
     else:
         return redirect('advance:login')
+
+
+def account_console(request):
+    pass
 
 
 def ajax(request):

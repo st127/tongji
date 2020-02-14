@@ -21,5 +21,6 @@ urlpatterns = [
     # path('adm_ind/', views.adm_ind, name='adm_inf'),
     path('personal/', views.personal, name='personal'),
     path('change_password', views.change_password, name='change_password'),
+    path('account_console/', views.account_console, name='account_console'),
     path('ajax/', views.ajax, name='ajax')
 ]
