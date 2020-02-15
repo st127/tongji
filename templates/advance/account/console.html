@@ -45,7 +45,7 @@
                                             {% endif %}
                                         </td>
                                         <td>
-                                            <a href="">修改</a>
+                                            <a href="{% url 'advance:account_console.edit_admin' %}?adm_id={{ item.pk }}">修改</a>
                                             <a href="{% url 'advance:account_console.del_admin' %}?adm_id={{ item.pk }}">删除</a>
                                             <a href="{% url 'xxtj:result' %}?admin_id={{ item.pk }}">结果入口</a>
                                         </td>
@@ -76,7 +76,7 @@
                                         <td>{{ item.name }}</td>
                                         <td>{{ item.class }}</td>
                                         <td>
-                                            <a href="">结果入口</a>
+                                            <a href="{% url 'advance:account_console.result' %}?sta_id={{ item.pk }}">结果入口</a>
                                         </td>
                                      </tr>
                                     {% endfor %}

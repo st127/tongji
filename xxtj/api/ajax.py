@@ -54,11 +54,11 @@ def get_result_by_sta(statistics):
         for_bit = for_bit + 1
         if for_bit % 2 == 1:
             stu_statistical[l_sta] = "<tr><td>" + stu_inf_all.filter(isDelete=False).get(
-                pk=items.stu_id).student_name + str(items.add_dt.astimezone(timezone('Asia/Shanghai'))) + "</tr></td>"
+                pk=items.stu_id).student_name + str(items.add_dt.astimezone(timezone('Asia/Shanghai')))[:19] + "</tr></td>"
             stu_reconded.append(items.stu_id)
         else:
             stu_statistical[l_sta] = '<tr class="success"><td>' + stu_inf_all.filter(isDelete=False).get(
-                pk=items.stu_id).student_name + str(items.add_dt.astimezone(timezone('Asia/Shanghai'))) + "</tr></td>"
+                pk=items.stu_id).student_name + str(items.add_dt.astimezone(timezone('Asia/Shanghai')))[:19] + "</tr></td>"
             stu_reconded.append(items.stu_id)
     for_bit = 0
     for items in stu_inf_all:

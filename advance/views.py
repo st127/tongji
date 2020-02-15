@@ -467,14 +467,26 @@ def account_console_del_admin(request):
 def account_console_edit_admin(request):
     admin_id = request.COOKIES.get('admin_id')
     token = request.COOKIES.get('token')
+    if request.POST.get('do') == 'edit_adm':
+        adm_inf = admin_information.objects.filter(isDelete=False).get(pk=request.POST.get('adm_id'))
+        adm_inf.admin_username = request.POST.get('username')
+        adm_inf.admin_password = make_password(request.POST.get('password'))
+        if request.POST.get('is_sa'):
+            adm_inf.level = 100
+        else:
+            adm_inf.level = 50
+        adm_inf.save()
+        return redirect('advance:account_console')
     if admin_id:
         adm_inf = admin_information.objects.filter(isDelete=False).get(pk=admin_id)
         if adm_inf.token != token:
             return redirect('advance:login')
         if adm_inf.level < 100:
             return HttpResponse("您的权限不够！")
+        admin_inf = admin_information.objects.filter(isDelete=False).get(pk=request.GET.get('adm_id'))
         return render(request, 'advance/account/admin/edit.html', {
             'admin_Authority': is_admin_authority(admin_id),
+            'adm_inf': admin_inf,
         })
 
     else:
@@ -484,14 +496,41 @@ def account_console_edit_admin(request):
 def account_console_result(request):
     admin_id = request.COOKIES.get('admin_id')
     token = request.COOKIES.get('token')
+    sta_id = request.GET.get('sta_id')
     if admin_id:
         adm_inf = admin_information.objects.filter(isDelete=False).get(pk=admin_id)
         if adm_inf.token != token:
             return redirect('advance:login')
         if adm_inf.level < 100:
             return HttpResponse("您的权限不够！")
-        return render(request, 'advance/account/admin/add.html', {
+        sta_inf = statistics_information.objects.filter(isDelete=False).get(pk=sta_id)
+        recond_all = sta_inf.recond_set.filter(isDelete=False).all()
+        reconded_tab = []
+        unreconded_tab = []
+        stu_inf_all = sta_inf.statistics_class.student_information_set.filter(isDelete=False).all()
+        for item in recond_all:
+            reconded_tab.append(item.stu_id)
+        for item in stu_inf_all:
+            if item.pk not in reconded_tab:
+                unreconded_tab.append({
+                    'pk': item.pk,
+                    'name': item.student_name,
+                })
+            else:
+                reconded_tab.append({
+                    'pk': item.pk,
+                    'name': item.student_name,
+                    'dt': recond_all.filter(isDelete=False).get(stu_id=item.pk).add_dt
+                })
+
+        for item in sta_inf.recond_set.filter(isDelete=False).all():
+            reconded_tab.append(item.stu_id)
+
+        return render(request, 'advance/account/statistics/result.html', {
             'admin_Authority': is_admin_authority(admin_id),
+            'recond': reconded_tab,
+            'unrecond': unreconded_tab,
+            'sta_ind': sta_inf,
         })
 
     else:
