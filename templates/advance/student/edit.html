@@ -45,11 +45,11 @@
             return_obj = JSON.parse(xmlhttp.responseText);
             if (return_obj.status === "success"){
                 alert("修改成功");
-                window.location.replace("{% url 'advance:cla_inf'%}");
+                window.location.replace("{% url 'advance:add_stu'%}");
             }
             else{
                 alert("修改失败");
-                window.location.replace("{% url 'advance:cla_inf'%}");
+                window.location.replace("{% url 'advance:add_stu'%}");
             }
         }
         if(xmlhttp.readyState === 4 && xmlhttp.status === 500){

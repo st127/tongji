@@ -324,7 +324,7 @@ def edit_sta(request):
         sta_inf = statistics_information.objects.filter(isDelete=False).get(pk=sta_id)
         class_inf = class_information.objects.filter(isDelete=False).all()
         sta_cla = sta_inf.statistics_class.pk
-        admin_inf = admin_information.objects.all()
+        admin_inf = admin_information.objects.filter(isDelete=False).all()
         admin_list = sta_inf.admin_statistics_set.filter(isDelete=False).all()
         admin_id_list = []
         for item in admin_list:
