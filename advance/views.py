@@ -10,11 +10,12 @@ from .api.ajax import *
 # Create your views here.
 
 def is_admin_authority(admin_id):
-    if admin_information.objects.filter(isDelete=False).get(pk=admin_id).level <100:
+    if admin_id is None:
+        return 0
+    if admin_information.objects.filter(isDelete=False).get(pk=admin_id).level < 100:
         return 0
     else:
         return 1
-
 
 
 def login(request):
@@ -39,7 +40,7 @@ def login(request):
             return response
     if request.COOKIES.get('token') and request.COOKIES.get('admin_id'):
         sta_inf = admin_information.objects.filter(isDelete=False).get(pk=request.COOKIES.get('admin_id'))
-        if request.COOKIES.get('token') == sta_inf.token:
+        if token == sta_inf.token:
             return redirect('advance:index')
     if admin_id is None:
         username = ''
@@ -535,7 +536,6 @@ def account_console_result(request):
 
     else:
         return redirect('advance:login')
-
 
 
 def ajax(request):
