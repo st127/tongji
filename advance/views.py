@@ -40,7 +40,7 @@ def login(request):
             return response
     if request.COOKIES.get('token') and request.COOKIES.get('admin_id'):
         sta_inf = admin_information.objects.filter(isDelete=False).get(pk=request.COOKIES.get('admin_id'))
-        if token == sta_inf.token:
+        if request.COOKIES.get('token') == sta_inf.token:
             return redirect('advance:index')
     if admin_id is None:
         username = ''

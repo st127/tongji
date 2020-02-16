@@ -132,7 +132,7 @@ def del_sta_ajax(request):
     admin_id_list = []
     for item in admin_statistics.objects.filter(statistics=sta_inf).filter(isDelete=False):
         admin_id_list.append(item.admin.pk)
-    if int(admin_id) not in admin_id_list:
+    if int(admin_id) not in admin_id_list and admin_information.objects.filter(isDelete=False).get(pk=admin_id).level <100:
         return JsonResponse({
             'status': 'failure',
             'dis': "您不是此统计的管理员",
@@ -161,7 +161,7 @@ def edit_sta_ajax(request):
     admin_id_list = []
     for item in admin_statistics.objects.filter(statistics=sta_inf).filter(isDelete=False):
         admin_id_list.append(item.admin.pk)
-    if int(admin_id) not in admin_id_list:
+    if int(admin_id) not in admin_id_list and admin_information.objects.filter(isDelete=False).get(pk=admin_id).level <100:
         return JsonResponse({
             'status': 'failure',
             'dis': '您不是此统计的管理员',
