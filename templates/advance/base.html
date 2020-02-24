@@ -1,4 +1,5 @@
 {% extends 'xxtj/base.html' %}
+{% load static %}
 {% block daohanglan %}
     <ul class="nav navbar-nav">
         <li class="dropdown">
@@ -65,7 +66,7 @@
                      <li class="divider">
                     </li>
                     <li>
-                         <a href="{% url 'advance:account_console' %}">账号管理</a>
+                         <a href="{% url 'advance:account_console' %}">系统管理</a>
                     </li>
                     <li>
                          <a href="{% url 'advance:account_console.add_admin' %}">添加账号</a>
@@ -75,3 +76,10 @@
         </li>
     </ul>
 {% endblock daohanglan %}
+{% block live2d %}
+    <!-- 实现拖动效果，需引入 JQuery UI -->
+    <script src="{% static 'live2d/jquery-ui.min.js' %}"></script>
+
+    <!-- 使用 aotuload.js 引入看板娘 -->
+    <script src="{% static 'live2d/autoload.js' %}"></script>
+{% endblock live2d%}

@@ -1,6 +1,13 @@
 {% extends 'xxtj/base.html' %}
 {% load static from static%}
 {% block head %}
+    <style type="text/css">
+	*{margin:0; padding:0;}
+	a{text-decoration: none;}
+	img{max-width: 100%; height: auto;}
+	.weixin-tip{display: none; position: fixed; left:0; top:0; bottom:0; background: rgba(0,0,0,0.8); filter:alpha(opacity=80);  height: 100%; width: 100%; z-index: 100;}
+	.weixin-tip p{text-align: center; margin-top: 10%; padding:0 5%;}
+	</style>
     <script type="text/javascript">
     var xmlhttp = false;
     function createRequest(url) {
@@ -28,10 +35,32 @@
     }
     function alertContents() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-            document.getElementById("shuoming_by_ajax").innerHTML = xmlhttp.responseText;
+            re_obj = JSON.parse(xmlhttp.responseText)
+            document.getElementById("shuoming_by_ajax").innerHTML = re_obj["description"];
+            if(re_obj["need_upload"] === true){
+                {#document.getElementById("file_div").innerHTML = "<tr><td><input type=button onClick=upload() value=选择照片(支持多选)></td></tr>";#}
+                var form = document.getElementById("table");
+                var ntr = document.createElement("tr");
+                var ntd1 = document.createElement("td");
+                ntd1.innerHTML = "<tr><td><input class='btn btn-default' type=button onClick=upload() value=选择照片(支持多选)></td></tr>";
+                ntr.appendChild(ntd1);
+                var ntd2 = document.createElement("td");
+                ntd2.innerHTML = "<div class='progress progress-striped active' id='myBar' style='display: none'>"+
+                    "<div class='progress-bar progress-success' id='progress'>"+
+                    "<div id='progress_num'></div>"+
+                    "</div>"+
+                    "</div>" +
+                    "<input type='hidden' name='file_params' value='"+re_obj["params"]+"'>";
+                ntr.appendChild(ntd2);
+                form.appendChild(ntr);
+                set_params("{% url 'xxtj:file'%}", {
+                    'save_id': re_obj["params"],
+                    'csrfmiddlewaretoken': getCookie("csrftoken")
+                })
+            }
         }
     }
-        function setCookie(cname, cvalue, exdays) {
+    function setCookie(cname, cvalue, exdays) {
         var d = new Date();
         d.setTime(d.getTime() + (exdays*24*60*60*1000));
         var expires = "expires="+ d.toUTCString();
@@ -59,7 +88,12 @@
             return false;
         }
         else{
-            createRequest("{% url 'xxtj:ajax' %}?statistics=" + str + "&do=query_description_by_statistics");
+            if((stu_id=getCookie("stu_id")) != ""){
+                createRequest("{% url 'xxtj:ajax' %}?statistics=" + str + "&stu_id="+stu_id+"&do=query_description_by_statistics");
+            }
+            else{
+                createRequest("{% url 'xxtj:ajax' %}?statistics=" + str + "&do=query_description_by_statistics");
+            }
         }
     }
     function validateForm()
@@ -74,21 +108,31 @@
             alert("姓名必须选择");
             return false;
         }
+        if (is_onload==0){
+            alert("文件必须上传");
+            return false;
+        }
         setCookie("stu_id", name, 365);
     }
     window.onload=function () {
         var stu_id = getCookie("stu_id");
-        if( stu_id!= "")
+        if(stu_id !== "")
             document.forms["main"]["name"].value=stu_id;
     }
     </script>
+    <script type="text/javascript" src="{% static 'xxtj/base/js/upload.js' %}"></script>
 {% endblock head %}
 
 
 {% block base %}
+    <div class="weixin-tip">
+		<p>
+			<img src="{% static 'xxtj/base/img/live_weixin.png' %}" alt="微信打开"/>
+		</p>
+	</div>
     <div class="container">
        <div class="row clearfix">
-           <div class="col-md-6 column">
+           <div class="col-sm-12 column">
                <div class="jumbotron" >
                    <h1>
                        信息统计系统
@@ -101,8 +145,8 @@
            </div>
        </div>
    </div>
-    <form action="{% url 'xxtj:add' %}" name="main" onsubmit="return validateForm()">
-        <table width="90%" class="table table-striped">
+    <form action="{% url 'xxtj:add' %}" name="main" onsubmit="return validateForm()" id="form">
+        <table width="90%" class="table table-striped" id="table">
 {#            <thead>#}
 {#					<tr>#}
 {#						<th>#}
@@ -129,16 +173,13 @@
                         {% for name in names %}
                             <option value="{{ name.pk }}">{{ name.student_name }}</option>
                         {% endfor %}
-
-    {#                    <option value="1">name_1</option>#}
-    {#                    <option value="2">name_2</option>#}
-    {#                    <option value="3">name_3</option>#}
                     </select></td>
                 </tr>
                 <tr>
                     <td><h4><strong>说明</strong></h4></td>
                     <td><span id="shuoming_by_ajax"></span></td>
                 </tr>
+                <div id="file_div"></div>
                 <tr>
                     <td><h4><strong>提交</strong></h4></td>
                     <td><input type="submit" class="btn btn-default" value="提交"></td>
@@ -149,3 +190,6 @@
         <input type="hidden" name="class_id" value="{{ class_id }}">
     </form>
 {% endblock base %}
+
+
+

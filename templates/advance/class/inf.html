@@ -10,7 +10,7 @@
 			</div>
 		</div>
 	</div>
-		<div class="col-md-12 column">
+		<div class="col-sm-8 column">
             <p>
                 {{ inf }}
             </p>
@@ -31,12 +31,12 @@
                         <td>{{ item.pk }}</td>
                         <td>{{ item.name_dis }}</td>
                         <td>{{ item.person_num }}</td>
-                        <td><a href="{% url 'advance:stu_inf' %}?class={{ item.pk }}">点击查看</a></td>
-                        <td><a href="{% url 'advance:sta_inf' %}?class={{ item.pk }}">点击查看</a></td>
+                        <td><a href="{% url 'advance:stu_inf' %}?class={{ item.pk }}" id="stu_inf">点击查看</a></td>
+                        <td><a href="{% url 'advance:sta_inf' %}?class={{ item.pk }}" id="sta_inf">点击查看</a></td>
                         <td>
-                            <a href="{% url 'advance:edit_cla' %}?class={{ item.pk }}">修改 </a>
-                            <a href="{% url 'advance:del_cla' %}?class={{ item.pk }}"> 删除</a>
-                            <a href="{% url 'xxtj:index' item.pk %}">获取入口</a>
+                            <a href="{% url 'advance:edit_cla' %}?class={{ item.pk }}" id="edit_cla">修改 </a>
+                            <a href="{% url 'advance:del_cla' %}?class={{ item.pk }}" id="del_cla"> 删除</a>
+                            <a href="{% url 'xxtj:index' item.pk %}" id="get_index">获取入口</a>
                         </td>
                 {% endfor %}
 

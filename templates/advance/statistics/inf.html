@@ -10,7 +10,7 @@
 			</div>
 		</div>
 	</div>
-		<div class="col-md-12 column">
+		<div class="col-sm-8 column">
             <p>
                 {{ inf }}
             </p>
@@ -20,6 +20,7 @@
 						<th>编号</th>
                         <th>名称</th>
                         <th>班级</th>
+                        <th>要求照片</th>
 						<th>操作</th>
 					</tr>
 				</thead>
@@ -28,10 +29,16 @@
                     <tr>
                         <td>{{ item.pk }}</td>
                         <td>{{ item.statistics_name }}</td>
-                        <td><a href="{% url 'advance:cla_inf' %}?cla={{ item.statistics_class.pk }}">点击查看</a></td>
+                        <td><a href="{% url 'advance:cla_inf' %}?cla={{ item.statistics_class.pk }}" id="cla_inf">点击查看</a></td>
+                        <td>{% if item.need_upload %}
+                                是
+                            {% else %}
+                                否
+                        {% endif %} </td>
+
                         <td>
-                            <a href="{% url 'advance:edit_sta' %}?sta={{ item.pk }}">修改 </a>
-                            <a href="{% url 'advance:del_sta' %}?sta={{ item.pk }}"> 删除</a>
+                            <a href="{% url 'advance:edit_sta' %}?sta={{ item.pk }}" id="edit_sta">修改 </a>
+                            <a href="{% url 'advance:del_sta' %}?sta={{ item.pk }}" id="del_sta"> 删除</a>
                         </td>
                 {% endfor %}
 

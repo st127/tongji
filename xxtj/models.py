@@ -20,6 +20,7 @@ class statistics_information(models.Model):
     statistics_class = models.ForeignKey("class_information", on_delete=models.CASCADE)
     statistics_name = models.CharField(max_length=20, default='none')
     statistics_description = models.CharField(max_length=4096)
+    need_upload = models.BooleanField(default=False)
     isDelete = models.BooleanField(default=False)
 
 
@@ -43,5 +44,7 @@ class recond(models.Model):
     stu_id = models.IntegerField()
     inf = models.TextField()
     url = models.TextField()
+    readed = models.BooleanField(default=False)
+    reconded = models.BooleanField(default=False)
     add_dt = models.DateTimeField()
     isDelete = models.BooleanField(default=False)

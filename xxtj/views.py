@@ -5,6 +5,8 @@ from .api.ajax import *
 from django.contrib.auth.hashers import make_password, check_password
 from pytz import timezone
 import hashlib
+from tongji.settings import get_upload_dir
+import os
 
 
 # Create your views here.
@@ -30,29 +32,37 @@ def add(request):
     class_id = request.GET.get('class_id')
     statistics = statistics_information.objects.filter(isDelete=False).get(pk=statistics)
     name = student_information.objects.filter(isDelete=False).get(pk=name)
-    return render(request, 'xxtj/add.html', {
-        'statistics': statistics,
-        'name': name,
-        'class_id': class_id,
-    })
+    file_params = request.GET.get('file_params')
+    if file_params:
+        filelist = os.listdir(get_upload_dir() + file_params)
+        return render(request, 'xxtj/add.html', {
+            'statistics': statistics,
+            'name': name,
+            'class_id': class_id,
+            'file_params': file_params,
+            'file_list': filelist,
+        })
 
 
 def ajax(request):
-    do = request.GET.get('do');
+    do = request.GET.get('do')
     if do is None:
         return HttpResponse("Format Error!")
     if do == 'query_description_by_statistics':
         statistics = int(request.GET.get('statistics'))
-        return query_description_by_statistics(statistics)
+        stu_id = request.GET.get('stu_id', default=0)
+        return query_description_by_statistics(statistics, stu_id)
     if do == 'add_recond':
-        statistics = int(request.GET.get('statistics'));
-        stu_id = int(request.GET.get('stu_id'));
-        return add_recond(statistics, stu_id);
+        statistics = int(request.GET.get('statistics'))
+        stu_id = int(request.GET.get('stu_id'))
+        if request.GET.get('file_params'):
+            return add_recond(statistics, stu_id, request.GET.get('file_params'))
+        return add_recond(statistics, stu_id)
     if do == 'get_result_by_sta':
-        statistics = int(request.GET.get('statistics'));
+        statistics = int(request.GET.get('statistics'))
         return get_result_by_sta(statistics)
     if do == 'clear_sta':
-        statistics = int(request.GET.get('statistics'));
+        statistics = int(request.GET.get('statistics'))
         return clear_sta(statistics)
     if do == 'add_description':
         json = request.GET.get('json')
@@ -111,7 +121,23 @@ def result(request):
         pass
 
 
+def file(request):
+    filenum_sum = request.POST.get("filenum_sum")
+    upload_dir = get_upload_dir()
+    try:
+        os.mkdir(upload_dir + '/' + request.POST.get("save_id"))
+    except FileExistsError:
+        pass
+    else:
+        pass
 
-
-
-
+    for file_num in range(0, int(filenum_sum)):
+        f = request.FILES.get('file' + str(file_num))
+        destination = open(upload_dir + request.POST.get("save_id") + '/' + request.POST.get("fileName" + str(file_num)), 'wb+')
+        for chunk in f.chunks():
+            destination.write(chunk)
+        destination.close()
+    stat = {
+        'status': "success",
+    }
+    return JsonResponse(stat)

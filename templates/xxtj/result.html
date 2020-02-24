@@ -38,8 +38,8 @@
         var statistical;
         var unstatistical;
         var i;
-        statistical="<table class='table'>";
-        unstatistical="<table class='table'>";
+        statistical="<table class='table table-striped'>";
+        unstatistical="<table class='table table-striped'>";
         if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
             return_obj = JSON.parse(xmlhttp.responseText);
             document.getElementById("description").innerHTML=return_obj.description;
@@ -54,6 +54,9 @@
             }
             unstatistical = unstatistical + "</table>"
             document.getElementById("unstatistical").innerHTML=unstatistical;
+        }
+        for(i=1; i<=return_obj["l_sta"]; i++) {
+            $('#carousel-'+ i).carousel('pause');
         }
     }
     function clear_response_() {
@@ -137,6 +140,7 @@
             }
             else{
                 alert("请先登录");
+                setCookie("admin_id", "{{ admin_id }}", 365)
                 window.location.href="{% url 'advance:login' %}?admin_id={{ admin_id }}&goto=result_advanced";
             }
         }

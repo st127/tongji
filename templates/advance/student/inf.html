@@ -10,7 +10,7 @@
 			</div>
 		</div>
 	</div>
-		<div class="col-md-12 column">
+		<div class="col-sm-8 column">
             <p>
                 {{ inf }}
             </p>
@@ -28,10 +28,10 @@
                     <tr>
                         <td>{{ item.pk }}</td>
                         <td>{{ item.student_name }}</td>
-                        <td><a href="{% url 'advance:cla_inf' %}?stu={{ item.pk }}">点击查看</a></td>
+                        <td><a href="{% url 'advance:cla_inf' %}?stu={{ item.pk }}" id="cla_inf">点击查看</a></td>
                         <td>
-                            <a href="{% url 'advance:edit_stu' %}?stu={{ item.pk }}">修改 </a>
-                            <a href="{% url 'advance:del_stu' %}?stu={{ item.pk }}"> 删除</a>
+                            <a href="{% url 'advance:edit_stu' %}?stu={{ item.pk }}" id="edit_stu">修改 </a>
+                            <a href="{% url 'advance:del_stu' %}?stu={{ item.pk }}" id="del_stu"> 删除</a>
                         </td>
                 {% endfor %}
 

@@ -45,9 +45,9 @@
                                             {% endif %}
                                         </td>
                                         <td>
-                                            <a href="{% url 'advance:account_console.edit_admin' %}?adm_id={{ item.pk }}">修改</a>
-                                            <a href="{% url 'advance:account_console.del_admin' %}?adm_id={{ item.pk }}">删除</a>
-                                            <a href="{% url 'xxtj:result' %}?admin_id={{ item.pk }}">结果入口</a>
+                                            <a href="{% url 'advance:account_console.edit_admin' %}?adm_id={{ item.pk }}" id="edit_adm">修改</a>
+                                            <a href="{% url 'advance:account_console.del_admin' %}?adm_id={{ item.pk }}" id="del_adm">删除</a>
+                                            <a href="{% url 'xxtj:result' %}?admin_id={{ item.pk }}" id="get_result">结果入口</a>
                                         </td>
                                      </tr>
                                     {% endfor %}
@@ -57,7 +57,7 @@
 					</div>
 				</div>
                 <div class="panel panel-default">
-					<div class="panel-heading">
+					<div class="panel-heading" id="sta_inf_all">
 						 <a class="panel-title collapsed" data-toggle="collapse" data-parent="#panel-468044" href="#panel-element-2">所有统计信息</a>
 					</div>
 					<div id="panel-element-2" class="panel-collapse collapse">
@@ -76,7 +76,7 @@
                                         <td>{{ item.name }}</td>
                                         <td>{{ item.class }}</td>
                                         <td>
-                                            <a href="{% url 'advance:account_console.result' %}?sta_id={{ item.pk }}">结果入口</a>
+                                            <a href="{% url 'advance:account_console.result' %}?sta_id={{ item.pk }}" id="sta_result">结果入口</a>
                                         </td>
                                      </tr>
                                     {% endfor %}

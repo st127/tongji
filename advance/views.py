@@ -54,6 +54,8 @@ def login(request):
 def index(request):
     admin_id = request.COOKIES.get('admin_id')
     token = request.COOKIES.get('token')
+    if admin_id is None:
+        return redirect('advance:login')
     admin_inf = admin_information.objects.filter(isDelete=False).get(pk=admin_id)
 
     if admin_inf.token == token:
@@ -61,7 +63,7 @@ def index(request):
             'admin_Authority': is_admin_authority(admin_id),
         })
     else:
-        return redirect('xxtj:login')
+        return redirect('advance:login')
 
 
 def cla_inf(request):
@@ -523,7 +525,6 @@ def account_console_result(request):
                     'name': item.student_name,
                     'dt': recond_all.filter(isDelete=False).get(stu_id=item.pk).add_dt
                 })
-
         for item in sta_inf.recond_set.filter(isDelete=False).all():
             reconded_tab.append(item.stu_id)
 

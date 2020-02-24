@@ -1,5 +1,6 @@
 from xxtj.models import *
 from django.http import HttpResponse, JsonResponse
+from xxtj.api.ajax import clear_sta
 import json
 
 
@@ -84,6 +85,7 @@ def edit_stu_ajax(request):
     stu_inf = student_information.objects.filter(isDelete=False).get(pk=stu_id)
     stu_inf.student_name = request.GET.get('stu_name')
     stu_inf.student_class = class_information.objects.filter(isDelete=False).get(pk=request.GET.get('class_id'))
+
     stu_inf.save()
     return JsonResponse({
         'status': 'success',
@@ -97,6 +99,8 @@ def add_sta_ajax(request):
     sta_inf.statistics_name = json_str["sta_name"]
     sta_inf.statistics_description = json_str["description"]
     sta_inf.statistics_class = class_information.objects.filter(isDelete=False).get(pk=json_str["class_id"])
+    if json_str['need_upload']:
+        sta_inf.need_upload = True
     sta_inf.save()
     admin_id = []
     for item in json_str['admin_id']:
@@ -168,7 +172,10 @@ def edit_sta_ajax(request):
         })
     sta_inf.statistics_name = json_str['sta_name']
     sta_inf.statistics_description = json_str['sta_des']
-    sta_inf.student_class = class_information.objects.filter(isDelete=False).get(pk=json_str["class_id"])
+    if sta_inf.student_class != class_information.objects.filter(isDelete=False).get(pk=json_str["class_id"]):
+        clear_sta(sta_inf.pk)
+    if json_str['need_upload']:
+        sta_inf.need_upload = True
     sta_inf.save()
     admin_sta = admin_information.objects.filter(isDelete=False).all()
     admin_id = []
@@ -189,9 +196,10 @@ def edit_sta_ajax(request):
             try:
                 obj = admin_statistics.objects.get(admin=item, statistics=sta_inf)
                 obj.isDelete = True
+                obj.save()
             except admin_statistics.DoesNotExist:
                 pass
-            obj.save()
+
     return JsonResponse({
         'status': 'success',
     })
