@@ -10,6 +10,7 @@
 	</style>
     <script type="text/javascript">
     var xmlhttp = false;
+    var set_file_lable = false;
     function createRequest(url) {
         if (window.XMLHttpRequest) {
             xmlhttp = new XMLHttpRequest();
@@ -26,7 +27,7 @@
             }
         }
         if(!xmlhttp){
-            alert("不能创建xmlhttp实例，请不要使用兼容模式或更换浏览器！")
+            alert("不能创建xmlhttp实例，请不要使用兼容模式或更换浏览器！");
             return false;
         }
         xmlhttp.onreadystatechange = alertContents;
@@ -34,29 +35,39 @@
         xmlhttp.send(null);
     }
     function alertContents() {
-        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-            re_obj = JSON.parse(xmlhttp.responseText)
+        if (xmlhttp.readyState == 4 && xmlhttp.status === 200) {
+            re_obj = JSON.parse(xmlhttp.responseText);
             document.getElementById("shuoming_by_ajax").innerHTML = re_obj["description"];
-            if(re_obj["need_upload"] === true){
+            if(re_obj["need_upload"] === true && set_file_lable === false){
+                set_file_lable = true;
                 {#document.getElementById("file_div").innerHTML = "<tr><td><input type=button onClick=upload() value=选择照片(支持多选)></td></tr>";#}
                 var form = document.getElementById("table");
                 var ntr = document.createElement("tr");
                 var ntd1 = document.createElement("td");
-                ntd1.innerHTML = "<tr><td><input class='btn btn-default' type=button onClick=upload() value=选择照片(支持多选)></td></tr>";
-                ntr.appendChild(ntd1);
                 var ntd2 = document.createElement("td");
-                ntd2.innerHTML = "<div class='progress progress-striped active' id='myBar' style='display: none'>"+
+                ntd1.innerHTML = "<h4><strong>选择照片(支持多选重选)</strong></h4>";
+                ntr.appendChild(ntd1);
+                ntd2.innerHTML = "<input type=file onchange=upload() accept=image/* id=file multiple>";
+                ntr.appendChild(ntd2);
+                form.appendChild(ntr);
+                var ntr = document.createElement("tr");
+                var ntd = document.createElement("td");
+                ntd.colSpan=2;
+                ntd.innerHTML = "<div class='progress progress-striped active' id='myBar' style='display: none'>"+
                     "<div class='progress-bar progress-success' id='progress'>"+
                     "<div id='progress_num'></div>"+
                     "</div>"+
                     "</div>" +
                     "<input type='hidden' name='file_params' value='"+re_obj["params"]+"'>";
-                ntr.appendChild(ntd2);
+                ntr.appendChild(ntd);
                 form.appendChild(ntr);
                 set_params("{% url 'xxtj:file'%}", {
                     'save_id': re_obj["params"],
                     'csrfmiddlewaretoken': getCookie("csrftoken")
                 })
+            }
+            if(re_obj['status'] != ""){
+                document.getElementById("status").innerHTML = re_obj['status'];
             }
         }
     }
@@ -73,22 +84,24 @@
         var ca = decodedCookie.split(';');
         for(var i = 0; i <ca.length; i++) {
             var c = ca[i];
-            while (c.charAt(0) == ' ') {
+            while (c.charAt(0) === ' ') {
                 c = c.substring(1);
              }
-             if (c.indexOf(name) == 0) {
+             if (c.indexOf(name) === 0) {
                 return c.substring(name.length, c.length);
              }
          }
         return "";
     }
-    function query_by_statistics(str) {
-        if(str=="0"){
+    function query_by_statistics() {
+        var str = document.forms["main"]["statistics"].value;
+        var stu_id=document.forms["main"]["name"].value;
+        if(str==="0"){
             window.alert("请在 选择项目 中选择您要进行提交的项目");
             return false;
         }
         else{
-            if((stu_id=getCookie("stu_id")) != ""){
+            if(stu_id !== 0){
                 createRequest("{% url 'xxtj:ajax' %}?statistics=" + str + "&stu_id="+stu_id+"&do=query_description_by_statistics");
             }
             else{
@@ -100,15 +113,15 @@
     {
         var sta=document.forms["main"]["statistics"].value;
         var name=document.forms["main"]["name"].value;
-        if (sta=="0"){
+        if (sta==="0"){
             alert("项目必须选择");
             return false;
         }
-        if (name=="0"){
+        if (name==="0"){
             alert("姓名必须选择");
             return false;
         }
-        if (is_onload==0){
+        if (is_onload===0 && set_file_lable){
             alert("文件必须上传");
             return false;
         }
@@ -159,31 +172,39 @@
             <tbody>
                 <tr>
                     <td width="30%"><h4><strong>选择项目</strong></h4></td>
-                    <td><select name="statistics" onchange=query_by_statistics(this.value)>
-                        <option value="0"></option>
-                        {% for statistic in statistics %}
-                            <option value="{{statistic.pk}}">{{ statistic.statistics_name }}</option>
-                        {% endfor %}
-                    </select></td>
+                    <td width="70%"><label>
+                        <select name="statistics" onchange=query_by_statistics()>
+                            <option value="0"></option>
+                            {% for statistic in statistics %}
+                                <option value="{{statistic.pk}}">{{ statistic.statistics_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </label></td>
                 </tr>
                 <tr>
                     <td><h4><strong>选择姓名</strong></h4></td>
-                    <td><select name="name">
-                        <option value="0"></option>
-                        {% for name in names %}
-                            <option value="{{ name.pk }}">{{ name.student_name }}</option>
-                        {% endfor %}
-                    </select></td>
+                    <td><label>
+                        <select name="name" onchange="query_by_statistics()">
+                            <option value="0"></option>
+                            {% for name in names %}
+                                <option value="{{ name.pk }}">{{ name.student_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </label></td>
                 </tr>
                 <tr>
                     <td><h4><strong>说明</strong></h4></td>
                     <td><span id="shuoming_by_ajax"></span></td>
                 </tr>
-                <div id="file_div"></div>
+                <tr>
+                    <td><h4><strong>状态</strong></h4></td>
+                    <td><span id="status"></span></td>
+                </tr>
                 <tr>
                     <td><h4><strong>提交</strong></h4></td>
                     <td><input type="submit" class="btn btn-default" value="提交"></td>
                 </tr>
+                <div id="file_div"></div>
             </tbody>
         </table>
         {% csrf_token %}

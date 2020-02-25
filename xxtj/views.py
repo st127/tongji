@@ -34,7 +34,12 @@ def add(request):
     name = student_information.objects.filter(isDelete=False).get(pk=name)
     file_params = request.GET.get('file_params')
     if file_params:
-        filelist = os.listdir(get_upload_dir() + file_params)
+        try:
+            filelist = os.listdir(get_upload_dir() + file_params)
+        except 	FileNotFoundError:
+            return HttpResponse('文件时间戳已过期')
+        else:
+            pass
         return render(request, 'xxtj/add.html', {
             'statistics': statistics,
             'name': name,
@@ -42,6 +47,13 @@ def add(request):
             'file_params': file_params,
             'file_list': filelist,
         })
+    return render(request, 'xxtj/add.html', {
+        'statistics': statistics,
+        'name': name,
+        'class_id': class_id,
+        'file_params': file_params,
+        # 'file_list': filelist,
+    })
 
 
 def ajax(request):
@@ -60,7 +72,8 @@ def ajax(request):
         return add_recond(statistics, stu_id)
     if do == 'get_result_by_sta':
         statistics = int(request.GET.get('statistics'))
-        return get_result_by_sta(statistics)
+        ua = request.GET.get('ua', default='normal')
+        return get_result_by_sta(statistics, ua)
     if do == 'clear_sta':
         statistics = int(request.GET.get('statistics'))
         return clear_sta(statistics)

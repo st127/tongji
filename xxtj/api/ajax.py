@@ -1,10 +1,14 @@
-from ..models import *
-from django.http import HttpResponse, JsonResponse
+import hashlib
+import json
+import os
+import shutil
+
+from django.http import JsonResponse
 from django.utils import timezone as d_tz
 from pytz import timezone
-import json, shutil
-import hashlib, os
+
 from tongji.settings import get_upload_dir
+from ..models import *
 
 
 def query_description_by_statistics(statistics, stu_id):
@@ -17,22 +21,33 @@ def query_description_by_statistics(statistics, stu_id):
     if int(stu_id) in stu_id_all:
         # print(statistics, stu_id, stu_id_all)
         add_recond(statistics, stu_id, setread=1)
-        stat = {
-            'description': description,
-            'need_upload': sta.need_upload,
-            'params': hashlib.md5((str(statistics)+str(d_tz.now())+str(stu_id)).encode(encoding='UTF-8')).hexdigest()
-        }
+        if recond.objects.filter(isDelete=False).get(statistics=sta, stu_id=stu_id).reconded:
+            stat = {
+                'description': description,
+                'need_upload': sta.need_upload,
+                'params': hashlib.md5((str(statistics)+str(d_tz.now())+str(stu_id)).encode(encoding='UTF-8')).hexdigest(),
+                'status': '已提交',
+            }
+        else:
+            stat = {
+                'description': description,
+                'need_upload': sta.need_upload,
+                'params': hashlib.md5(
+                    (str(statistics) + str(d_tz.now()) + str(stu_id)).encode(encoding='UTF-8')).hexdigest(),
+                'status': '未提交',
+            }
     else:
         stat = {
             'description': description,
             'need_upload': sta.need_upload,
-            'params': hashlib.md5((str(statistics) + str(d_tz.now())).encode(encoding='UTF-8')).hexdigest()
+            'params': hashlib.md5((str(statistics) + str(d_tz.now())).encode(encoding='UTF-8')).hexdigest(),
+            'status': '',
         }
     return JsonResponse(stat)
 
 
-def add_recond(statistics, stu_id , file_params='', setread=0):
-    is_exists = recond.objects.all().filter(isDelete=False).filter(stu_id=stu_id).exists()  # 查重
+def add_recond(statistics, stu_id, file_params='', setread=0):
+    is_exists = recond.objects.all().filter(isDelete=False).filter(statistics=statistics_information.objects.get(pk=statistics)).filter(stu_id=stu_id).exists()  # 查重
     if setread == 1:
         if not is_exists:
             recond_inf = recond()
@@ -46,7 +61,7 @@ def add_recond(statistics, stu_id , file_params='', setread=0):
             recond_inf.url = 'null'
         else:
             # print("********")
-            recond_inf = recond.objects.filter(isDelete=False).get(stu_id=stu_id)
+            recond_inf = recond.objects.filter(isDelete=False).get(statistics=statistics_information.objects.get(pk=statistics), stu_id=stu_id)
             recond_inf.statistics = statistics_information.objects.filter(isDelete=False).get(pk=statistics)
             recond_inf.student = student_information.objects.filter(isDelete=False).get(pk=stu_id)
             recond_inf.stu_id = int(stu_id)
@@ -82,7 +97,7 @@ def add_recond(statistics, stu_id , file_params='', setread=0):
             recond_inf.url = 'null'
         else:
             # print("********")
-            recond_inf = recond.objects.filter(isDelete=False).get(stu_id=stu_id)
+            recond_inf = recond.objects.filter(isDelete=False).get(statistics=statistics_information.objects.get(pk=statistics), stu_id=stu_id)
             recond_inf.statistics = statistics_information.objects.filter(isDelete=False).get(pk=statistics)
             recond_inf.student = student_information.objects.filter(isDelete=False).get(pk=stu_id)
             recond_inf.stu_id = int(stu_id)
@@ -98,7 +113,7 @@ def add_recond(statistics, stu_id , file_params='', setread=0):
     return JsonResponse(stat)
 
 
-def get_result_by_sta(statistics):
+def get_result_by_sta(statistics, ua):
     sta = statistics_information.objects.filter(isDelete=False).get(pk=statistics)
     reconds = sta.recond_set.all().filter(isDelete=False).filter(reconded=True)
     stu_inf_all = sta.statistics_class.student_information_set.all()
@@ -123,9 +138,14 @@ def get_result_by_sta(statistics):
                 stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<li data-slide-to="' + str(file_p) + '" data-target="#carousel-' + str(l_sta) + '"></li>')
             stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '</ol>')
             stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<div class="carousel-inner">')
-            stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<div class="item active"><img alt="" src="/static/upload/'+str(statistics)+'/'+str(item.stu_id)+'/'+os.listdir(get_upload_dir()+str(statistics)+'/'+str(item.stu_id))[0]+'" /></div>')
-            for file_src in os.listdir(get_upload_dir()+str(statistics)+'/'+str(item.stu_id))[1:]:
-                stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<div class="item"><img alt="" src="/static/upload/'+str(statistics)+'/'+str(item.stu_id)+'/'+file_src+'" /></div>')
+            if ua is 'weixin':
+                stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<div class="item active"><img alt="" src="/static/upload/'+str(statistics)+'/'+str(item.stu_id)+'/'+os.listdir(get_upload_dir()+str(statistics)+'/'+str(item.stu_id))[0]+'" /></div>')
+                for file_src in os.listdir(get_upload_dir()+str(statistics)+'/'+str(item.stu_id))[1:]:
+                    stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<div class="item"><img alt="" src="/static/upload/'+str(statistics)+'/'+str(item.stu_id)+'/'+file_src+'" /></div>')
+            else:
+                stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<div class="item active"><a href="/static/upload/'+str(statistics)+'/'+str(item.stu_id)+'/'+os.listdir(get_upload_dir()+str(statistics)+'/'+str(item.stu_id))[0]+'"><img alt="" src="/static/upload/'+str(statistics)+'/'+str(item.stu_id)+'/'+os.listdir(get_upload_dir()+str(statistics)+'/'+str(item.stu_id))[0]+'" /></a></div>')
+                for file_src in os.listdir(get_upload_dir()+str(statistics)+'/'+str(item.stu_id))[1:]:
+                    stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<div class="item"><a href="/static/upload/'+str(statistics)+'/'+str(item.stu_id)+'/'+os.listdir(get_upload_dir()+str(statistics)+'/'+str(item.stu_id))[0]+'"><img alt="" src="/static/upload/'+str(statistics)+'/'+str(item.stu_id)+'/'+file_src+'" /></a></div>')
             stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], "</div>")
             stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<a class="left carousel-control" href="#carousel-'+str(l_sta)+'" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></a>')
             stu_statistical[l_sta] = add_tail(stu_statistical[l_sta],'<a class="right carousel-control" href="#carousel-'+str(l_sta)+'" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></a>')

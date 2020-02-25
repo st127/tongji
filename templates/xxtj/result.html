@@ -1,6 +1,16 @@
 {% extends 'xxtj/base.html' %}
 {% block head %}
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <script type="text/javascript">
+    function is_weixin(){
+        var ua = navigator.userAgent.toLowerCase();
+        if(ua.match(/MicroMessenger/i)=="micromessenger") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     var xmlhttp = false;
     function createRequest(url, dothing) {
         if (window.XMLHttpRequest) {
@@ -18,7 +28,7 @@
             }
         }
         if(!xmlhttp){
-            alert("不能创建xmlhttp实例，请不要使用兼容模式或更换浏览器！")
+            alert("不能创建xmlhttp实例，请不要使用兼容模式或更换浏览器！");
             return false;
         }
         if(dothing === "get_sta_inf"){
@@ -53,11 +63,12 @@
                 unstatistical = unstatistical + return_obj.unstatistical[i];
             }
             unstatistical = unstatistical + "</table>"
-            document.getElementById("unstatistical").innerHTML=unstatistical;
+            document.getElementById("unstatistical").innerHTML=unstatistical
+            for(i=1; i<=return_obj.l_sta; i++) {
+                $('#carousel-'+ i).carousel('pause');
+            }
         }
-        for(i=1; i<=return_obj["l_sta"]; i++) {
-            $('#carousel-'+ i).carousel('pause');
-        }
+
     }
     function clear_response_() {
         var return_obj;
@@ -74,7 +85,12 @@
             alert("请选择项目");
             return false;
         }
-        createRequest("{% url 'xxtj:ajax' %}?statistics=" + str + "&do=get_result_by_sta", "get_sta_inf");
+        if (is_weixin()){
+            createRequest("{% url 'xxtj:ajax' %}?statistics=" + str + "&do=get_result_by_sta&ua=weixin", "get_sta_inf");
+        }
+        else{
+            createRequest("{% url 'xxtj:ajax' %}?statistics=" + str + "&do=get_result_by_sta", "get_sta_inf");
+        }
     }
     function clear_() {
         var statistics=document.getElementById("statistics").value;

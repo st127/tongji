@@ -1,7 +1,11 @@
-from xxtj.models import *
-from django.http import HttpResponse, JsonResponse
-from xxtj.api.ajax import clear_sta
 import json
+import os
+import shutil
+from tongji.settings import get_upload_dir
+from django.http import JsonResponse
+
+from xxtj.api.ajax import clear_sta
+from xxtj.models import *
 
 
 def add_cla_ajax(request):
@@ -101,6 +105,7 @@ def add_sta_ajax(request):
     sta_inf.statistics_class = class_information.objects.filter(isDelete=False).get(pk=json_str["class_id"])
     if json_str['need_upload']:
         sta_inf.need_upload = True
+        os.mkdir(get_upload_dir()+str(sta_inf.pk))
     sta_inf.save()
     admin_id = []
     for item in json_str['admin_id']:
@@ -151,6 +156,8 @@ def del_sta_ajax(request):
     for item in adm_sta_inf:
         item.isDelete = True
         item.save()
+    if sta_inf.need_upload:
+        shutil.rmtree(get_upload_dir()+str(sta_inf.pk))
     return JsonResponse({
         'status': 'success',
     })
@@ -172,10 +179,15 @@ def edit_sta_ajax(request):
         })
     sta_inf.statistics_name = json_str['sta_name']
     sta_inf.statistics_description = json_str['sta_des']
-    if sta_inf.student_class != class_information.objects.filter(isDelete=False).get(pk=json_str["class_id"]):
+    if sta_inf.statistics_class != class_information.objects.filter(isDelete=False).get(pk=json_str["class_id"]):
         clear_sta(sta_inf.pk)
-    if json_str['need_upload']:
-        sta_inf.need_upload = True
+    if json_str['need_upload'] != sta_inf.need_upload:
+        if json_str['need_upload']:
+            os.mkdir(get_upload_dir() + str(sta_inf.pk))
+            sta_inf.need_upload = True
+        else:
+            shutil.rmtree(get_upload_dir() + str(sta_inf.pk))
+            sta_inf.need_upload = False
     sta_inf.save()
     admin_sta = admin_information.objects.filter(isDelete=False).all()
     admin_id = []

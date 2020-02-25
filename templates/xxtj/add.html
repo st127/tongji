@@ -41,7 +41,11 @@
         }
     }
     function add_recond(str) {
-        createRequest("{% url 'xxtj:ajax' %}?statistics={{ statistics.pk }}&stu_id={{ name.pk }}&file_params={{ file_params }}&do=add_recond");
+        {% if file_params %}
+            createRequest("{% url 'xxtj:ajax' %}?statistics={{ statistics.pk }}&stu_id={{ name.pk }}&file_params={{ file_params }}&do=add_recond");
+        {% else %}
+            createRequest("{% url 'xxtj:ajax' %}?statistics={{ statistics.pk }}&stu_id={{ name.pk }}&do=add_recond");
+        {% endif %}
     }
     function go_index() {
         window.location.replace("{% url 'xxtj:index' class_id%}");
@@ -61,6 +65,8 @@
         <td><h4><strong>姓名</strong></h4></td>
         <td><h5><strong>{{ name.student_name }}</strong></h5></td>
     </tr>
+{% if file_params %}
+
     <tr>
         <td><strong>照片</strong></td>
         <td>
@@ -98,6 +104,7 @@
             </div>
         </td>
     </tr>
+{% endif %}
     <tr>
         <td>
             <input type="button"  onclick="add_recond()" value="确认">
