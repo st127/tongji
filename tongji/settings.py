@@ -77,11 +77,11 @@ WSGI_APPLICATION = 'tongji.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'django',
-        'HOST': '10.0.0.7',
+        'NAME': '',             #database name
+        'HOST': '',             #sql host
         'PORT': 3306,
-        'USER': 'Wentao',
-        'PASSWORD': "dumywensqltao",
+        'USER': '',             #
+        'PASSWORD': "",         #
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
         },
