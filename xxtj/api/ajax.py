@@ -138,14 +138,14 @@ def get_result_by_sta(statistics, ua):
                 stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<li data-slide-to="' + str(file_p) + '" data-target="#carousel-' + str(l_sta) + '"></li>')
             stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '</ol>')
             stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<div class="carousel-inner">')
-            if ua is 'weixin':
+            if ua == 'weixin':
                 stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<div class="item active"><img alt="" src="/static/upload/'+str(statistics)+'/'+str(item.stu_id)+'/'+os.listdir(get_upload_dir()+str(statistics)+'/'+str(item.stu_id))[0]+'" /></div>')
                 for file_src in os.listdir(get_upload_dir()+str(statistics)+'/'+str(item.stu_id))[1:]:
                     stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<div class="item"><img alt="" src="/static/upload/'+str(statistics)+'/'+str(item.stu_id)+'/'+file_src+'" /></div>')
             else:
-                stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<div class="item active"><a href="/static/upload/'+str(statistics)+'/'+str(item.stu_id)+'/'+os.listdir(get_upload_dir()+str(statistics)+'/'+str(item.stu_id))[0]+'"><img alt="" src="/static/upload/'+str(statistics)+'/'+str(item.stu_id)+'/'+os.listdir(get_upload_dir()+str(statistics)+'/'+str(item.stu_id))[0]+'" /></a></div>')
+                stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<div class="item active"><a target="_blank" href="/static/upload/'+str(statistics)+'/'+str(item.stu_id)+'/'+os.listdir(get_upload_dir()+str(statistics)+'/'+str(item.stu_id))[0]+'"><img alt="" src="/static/upload/'+str(statistics)+'/'+str(item.stu_id)+'/'+os.listdir(get_upload_dir()+str(statistics)+'/'+str(item.stu_id))[0]+'" /></a></div>')
                 for file_src in os.listdir(get_upload_dir()+str(statistics)+'/'+str(item.stu_id))[1:]:
-                    stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<div class="item"><a href="/static/upload/'+str(statistics)+'/'+str(item.stu_id)+'/'+os.listdir(get_upload_dir()+str(statistics)+'/'+str(item.stu_id))[0]+'"><img alt="" src="/static/upload/'+str(statistics)+'/'+str(item.stu_id)+'/'+file_src+'" /></a></div>')
+                    stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<div class="item"><a target="_blank" href="/static/upload/'+str(statistics)+'/'+str(item.stu_id)+'/'+file_src+'"><img alt="" src="/static/upload/'+str(statistics)+'/'+str(item.stu_id)+'/'+file_src+'" /></a></div>')
             stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], "</div>")
             stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<a class="left carousel-control" href="#carousel-'+str(l_sta)+'" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></a>')
             stu_statistical[l_sta] = add_tail(stu_statistical[l_sta],'<a class="right carousel-control" href="#carousel-'+str(l_sta)+'" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></a>')

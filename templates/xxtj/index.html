@@ -38,6 +38,11 @@
         if (xmlhttp.readyState == 4 && xmlhttp.status === 200) {
             re_obj = JSON.parse(xmlhttp.responseText);
             document.getElementById("shuoming_by_ajax").innerHTML = re_obj["description"];
+            if(is_weixin())
+            {
+                weixin_callout();
+                return;
+            }
             if(re_obj["need_upload"] === true && set_file_lable === false){
                 set_file_lable = true;
                 {#document.getElementById("file_div").innerHTML = "<tr><td><input type=button onClick=upload() value=选择照片(支持多选)></td></tr>";#}
@@ -47,7 +52,7 @@
                 var ntd2 = document.createElement("td");
                 ntd1.innerHTML = "<h4><strong>选择照片(支持多选重选)</strong></h4>";
                 ntr.appendChild(ntd1);
-                ntd2.innerHTML = "<input type=file onchange=upload() accept=image/* id=file multiple>";
+                ntd2.innerHTML = "<input type='file' onchange='upload()' accept='image/*' id='file' multiple>";
                 ntr.appendChild(ntd2);
                 form.appendChild(ntr);
                 var ntr = document.createElement("tr");
@@ -92,6 +97,15 @@
              }
          }
         return "";
+    }
+    function weixin_callout() {
+        if(is_weixin())
+        {
+            var winHeight = $(window).height();
+            $(".weixin-tip").css("height", winHeight);
+            $(".weixin-tip").show();
+            return;
+        }
     }
     function query_by_statistics() {
         var str = document.forms["main"]["statistics"].value;
