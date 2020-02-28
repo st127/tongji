@@ -52,7 +52,7 @@
                 var ntd2 = document.createElement("td");
                 ntd1.innerHTML = "<h4><strong>选择照片(支持多选重选)</strong></h4>";
                 ntr.appendChild(ntd1);
-                ntd2.innerHTML = "<input type='file' onchange='upload()' accept='image/*' id='file' multiple>";
+                ntd2.innerHTML = "<input type='file' onchange='upload()' accept='image/*' id='file' multiple='multiple'>";
                 ntr.appendChild(ntd2);
                 form.appendChild(ntr);
                 var ntr = document.createElement("tr");
@@ -136,7 +136,7 @@
             return false;
         }
         if (is_onload===0 && set_file_lable){
-            alert("文件必须上传");
+            alert("文件必须上传(在底下)");
             return false;
         }
         setCookie("stu_id", name, 365);
@@ -147,14 +147,14 @@
             document.forms["main"]["name"].value=stu_id;
     }
     </script>
-    <script type="text/javascript" src="{% static 'xxtj/base/js/upload.js' %}"></script>
+    <script type="text/javascript" src="{% static 'xxtj/base/js/upload_3.js' %}"></script>
 {% endblock head %}
 
 
 {% block base %}
     <div class="weixin-tip">
 		<p>
-			<img src="{% static 'xxtj/base/img/live_weixin.png' %}" alt="微信打开"/>
+			<img src="{% static 'xxtj/base/img/live_weixin_1.png' %}" alt="微信打开"/>
 		</p>
 	</div>
     <div class="container">
@@ -219,6 +219,7 @@
                     <td><input type="submit" class="btn btn-default" value="提交"></td>
                 </tr>
                 <div id="file_div"></div>
+                <div id="tips_addmore_div" class="alert alert-success" role="alert" style="display: none">您可以再次点击添加文件以添加更多的照片！</div>
             </tbody>
         </table>
         {% csrf_token %}

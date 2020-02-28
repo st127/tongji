@@ -70,35 +70,43 @@ let upload = (resolve, reject)=>{
 		for(let i=0; i<length; i++){
 			let file = input.files[i];
 			let tmparr = file.name.split(".");
-			let fileType =  tmparr[tmparr.length-1].toLowerCase();
-
-			if(uploadOption.filter!=null && uploadOption.filter!=""){
-				let filterArr = uploadOption.filter.split(",");
-				let notFilter = true;
-				for(let i=0; i<filterArr.length; i++){
-					if(fileType == filterArr[i].toLowerCase()){
-						notFilter = false;
-//						break;
-					}
-				}
-				alert(1);
-				if(notFilter){
-					//文件类型不符合要求
-					if(uploadOption.errorCallback!=undefined && uploadOption.errorCallback!=null){
-						uploadOption.errorCallback("文件类型不符合要求");
-					}
-					else{
-					    alert("文件类型不符合要求");
+			if(tmparr.length == 1) {
+                file.name = file.name.replace('%3A','') + ".jpg";
+            }
+			else {
+                let fileType =  tmparr[tmparr.length-1].toLowerCase();
+                if(uploadOption.filter!=null && uploadOption.filter!=""){
+                    let filterArr = uploadOption.filter.split(",");
+                    let notFilter = true;
+                    for(let i=0; i<filterArr.length; i++){
+                        if(fileType == filterArr[i].toLowerCase()){
+                            notFilter = false;
+                        }
                     }
-					//reject("文件类型不符合要求");
-					return;
-				}
-			}
+                    alert(1);
+                    if(notFilter){
+                        //文件类型不符合要求
+                        if(uploadOption.errorCallback!=undefined && uploadOption.errorCallback!=null){
+                            uploadOption.errorCallback("文件类型不符合要求");
+                        }
+                        else{
+                            alert("文件类型不符合要求");
+                        }
+                        //reject("文件类型不符合要求");
+                        return;
+                    }
+                }
+            }
 			sizeM = file.size/1024/1024 + sizeM;
 			form.append("file"+i, file);
 			form.append("fileName"+i, file.name);
 			form.append("size"+i, file.size);
+
 		}
+		if(length == 1){
+		    let elem = document.getElementById("tips_addmore_div");
+	        elem.style.display = "";
+        }
         form.append("filenum_sum", length);
         if(sizeM > uploadOption.maxsize){
             //文件大小不符合要求
@@ -205,8 +213,9 @@ let upload = (resolve, reject)=>{
             }
         }
         xhr.send(form);
+        xmlhttp.send(null);
         input.value = '';
-        // input.outerHTML = '';
+        input.outerHTML = '';
 }
 
 

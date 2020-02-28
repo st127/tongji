@@ -2,20 +2,18 @@
 {% block head %}
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script type="text/javascript">
+    var file_tag = 0;
     function is_weixin(){
         var ua = navigator.userAgent.toLowerCase();
         if(ua.match(/MicroMessenger/i)=="micromessenger") {
-            if(ua.match(/Mobile/i)=="mobile"){
-                return true;
-            }
-            return false;
+            return true;
         }
         else {
             return false;
         }
     }
     var xmlhttp = false;
-    function createRequest(url, dothing) {
+    function createRequest(url, callback) {
         if (window.XMLHttpRequest) {
             xmlhttp = new XMLHttpRequest();
             if(xmlhttp.overrideMimeType){
@@ -34,15 +32,7 @@
             alert("不能创建xmlhttp实例，请不要使用兼容模式或更换浏览器！");
             return false;
         }
-        if(dothing === "get_sta_inf"){
-            xmlhttp.onreadystatechange = get_sta_inf;
-        }
-        else if(dothing === "clear_response"){
-            xmlhttp.onreadystatechange = clear_response_;
-        }
-        else if(dothing === "check_token"){
-            xmlhttp.onreadystatechange = check_token;
-        }
+        xmlhttp.onreadystatechange = callback;
         xmlhttp.open("GET", url, true);
         xmlhttp.send(null);
     }
@@ -70,6 +60,7 @@
             for(i=1; i<=return_obj.l_sta; i++) {
                 $('#carousel-'+ i).carousel('pause');
             }
+            file_tag = return_obj.file_tag;
         }
 
     }
@@ -89,10 +80,10 @@
             return false;
         }
         if (is_weixin()){
-            createRequest("{% url 'xxtj:ajax' %}?statistics=" + str + "&do=get_result_by_sta&ua=weixin", "get_sta_inf");
+            createRequest("{% url 'xxtj:ajax' %}?statistics=" + str + "&do=get_result_by_sta&ua=weixin", get_sta_inf);
         }
         else{
-            createRequest("{% url 'xxtj:ajax' %}?statistics=" + str + "&do=get_result_by_sta", "get_sta_inf");
+            createRequest("{% url 'xxtj:ajax' %}?statistics=" + str + "&do=get_result_by_sta", get_sta_inf);
         }
     }
     function clear_() {
@@ -101,7 +92,7 @@
             alert("请选择项目");
             return false;
         }
-        createRequest("{% url 'xxtj:ajax' %}?statistics= " + statistics + "&do=clear_sta", "clear_response");
+        createRequest("{% url 'xxtj:ajax' %}?statistics= " + statistics + "&do=clear_sta", clear_response_);
     }
     function add_description() {
         window.location.href="{% url 'xxtj:result'%}" + "?admin_id={{ admin_id }}&do=add_description";
@@ -141,7 +132,7 @@
         var token;
         if (getQueryVariable("admin_id") != false) {
             if ((token = getCookie("token")) != "") {
-                createRequest("{% url 'xxtj:ajax' %}?do=check_login_token&admin_id={{ admin_id }}&token=" + token, "check_token")
+                createRequest("{% url 'xxtj:ajax' %}?do=check_login_token&admin_id={{ admin_id }}&token=" + token, check_token)
             }
             else{
                 alert("请先登录");
@@ -163,6 +154,19 @@
                 window.location.href="{% url 'advance:login' %}?admin_id={{ admin_id }}&goto=result_advanced";
             }
         }
+    }
+    function mkdl_zip() {
+        if (file_tag === false){
+            alert("您选择的统计没有照片信息");
+            return;
+        }
+        sta_id = document.getElementById("statistics").value;
+        createRequest("{% url 'xxtj:ajax' %}?do=mkdl_zip&sta_id=" + sta_id, mkdl_zip_callback);
+        alert("正在生成压缩包，生成完成后会自动开始下载，请耐心等待~");
+        return;
+    }
+    function mkdl_zip_callback() {
+
     }
 </script>
 {% endblock head %}
@@ -201,6 +205,7 @@
             <td colspan="2">
                 <button onclick="clear_()" class="btn btn-warning">清除数据并开始下一次统计</button>
                 <button onclick="add_description()" class="btn btn-default">添加/修改说明</button>
+                <button onclick="" class="btn btn-default">下载数据压缩包</button>
             </td>
         </tr>
         <tr>

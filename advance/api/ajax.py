@@ -103,6 +103,7 @@ def add_sta_ajax(request):
     sta_inf.statistics_name = json_str["sta_name"]
     sta_inf.statistics_description = json_str["description"]
     sta_inf.statistics_class = class_information.objects.filter(isDelete=False).get(pk=json_str["class_id"])
+
     if json_str['need_upload']:
         sta_inf.need_upload = True
         os.mkdir(get_upload_dir()+str(sta_inf.pk))
@@ -156,7 +157,7 @@ def del_sta_ajax(request):
     for item in adm_sta_inf:
         item.isDelete = True
         item.save()
-    if sta_inf.need_upload:
+    if os.path.exists(get_upload_dir()+str(sta_inf.pk)):
         shutil.rmtree(get_upload_dir()+str(sta_inf.pk))
     return JsonResponse({
         'status': 'success',
@@ -165,7 +166,7 @@ def del_sta_ajax(request):
 
 def edit_sta_ajax(request):
     admin_id = request.COOKIES.get('admin_id')
-    json_obj = request.GET.get('json')
+    json_obj = request.POST.get('json')
     json_str = json.loads(json_obj)
     sta_id = json_str['sta']
     sta_inf = statistics_information.objects.filter(isDelete=False).get(pk=sta_id)
@@ -178,7 +179,7 @@ def edit_sta_ajax(request):
             'dis': '您不是此统计的管理员',
         })
     sta_inf.statistics_name = json_str['sta_name']
-    sta_inf.statistics_description = json_str['sta_des']
+    sta_inf.statistics_description = json_str['description']
     if sta_inf.statistics_class != class_information.objects.filter(isDelete=False).get(pk=json_str["class_id"]):
         clear_sta(sta_inf.pk)
     if json_str['need_upload'] != sta_inf.need_upload:

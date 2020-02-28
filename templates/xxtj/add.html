@@ -28,16 +28,20 @@
     }
     function alertContents() {
         var return_obj;
-        if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
             return_obj = JSON.parse(xmlhttp.responseText);
             if (return_obj.status === "success"){
                 alert("添加成功");
+                let elem = document.getElementById("tips_success_div");
+	            elem.style.display = "";
                 go_index();
+                return;
             }
-            else{
+        }
+        if (xmlhttp.readyState ==4){
                 alert("添加失败");
                 go_index();
-            }
+                return;
         }
     }
     function add_recond(str) {
@@ -121,4 +125,5 @@
         </td>
     </tr>
 </table>
+<div id="tips_success_div" class="alert alert-success" role="alert" style="display: none">添加完成！</div>
 {% endblock base %}

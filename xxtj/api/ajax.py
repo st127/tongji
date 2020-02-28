@@ -15,6 +15,24 @@ def query_description_by_statistics(statistics, stu_id):
     sta = statistics_information.objects.filter(isDelete=False).get(pk=statistics)
     description = sta.statistics_description
     stu_all = sta.statistics_class.student_information_set.filter().all()
+    if os.path.exists(get_upload_dir() + str(statistics) + '/' + '0' + '/'):
+        file_path = get_upload_dir() + str(statistics) + '/' + '0' + '/'
+        description = add_tail(description, "<div class='carousel slide' id='carousel-0'>")
+        description = add_tail(description, '<ol class="carousel-indicators">')
+        file_num = len(os.listdir(file_path))
+        description = add_tail(description, '<li class="active" data-slide-to="0" data-target="#carousel-0"></li>')
+        for file_p in range(1, file_num):
+            description = add_tail(description, '<li data-slide-to="' + str(file_p) + '" data-target="#carousel-0"></li>')
+        description = add_tail(description, '</ol>')
+        description = add_tail(description, '<div class="carousel-inner">')
+        description = add_tail(description, '<div class="item active"><img alt="" src="/static/upload/'+str(statistics)+'/'+'0'+'/'+os.listdir(file_path)[0]+'" /></div>')
+        for file_src in os.listdir(file_path)[1:]:
+            description = add_tail(description, '<div class="item"><img alt="" src="/static/upload/'+str(statistics)+'/'+'0'+'/'+file_src+'" /></div>')
+        description = add_tail(description, "</div>")
+        description = add_tail(description, '<a class="left carousel-control" href="#carousel-0" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></a>')
+        description = add_tail(description,'<a class="right carousel-control" href="#carousel-0" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></a>')
+        description = add_tail(description, "</tr></td>")
+        description = add_tail(description, "</div>")
     stu_id_all =[]
     for item in stu_all:
         stu_id_all.append(int(item.pk))
@@ -80,9 +98,14 @@ def add_recond(statistics, stu_id, file_params='', setread=0):
                 pass
             else:
                 pass
-            for file_name in os.listdir(file_tmp_dir):
-                shutil.copyfile(file_tmp_dir + '/' + file_name, file_new_dir + '/' + file_name)
-            shutil.rmtree(file_tmp_dir)
+            try:
+                for file_name in os.listdir(file_tmp_dir):
+                    shutil.copyfile(file_tmp_dir + '/' + file_name, file_new_dir + '/' + file_name)
+                shutil.rmtree(file_tmp_dir)
+            except FileNotFoundError:
+                pass
+            else:
+                pass
             # print(file_tmp_dir)
             # print(file_new_dir)
         if not is_exists:
@@ -115,7 +138,7 @@ def add_recond(statistics, stu_id, file_params='', setread=0):
 
 def get_result_by_sta(statistics, ua):
     sta = statistics_information.objects.filter(isDelete=False).get(pk=statistics)
-    reconds = sta.recond_set.all().filter(isDelete=False).filter(reconded=True)
+    reconds = sta.recond_set.all().filter(isDelete=False).filter(reconded=True).order_by('stu_id')
     stu_inf_all = sta.statistics_class.student_information_set.all()
     stu_statistical = {}
     stu_unstatistical = {}
@@ -123,39 +146,39 @@ def get_result_by_sta(statistics, ua):
     l_sta = 0
     l_unsta = 0
     for item in reconds:
-        l_sta = l_unsta + 1
+        l_sta = l_sta + 1
         stu_reconded.append(item.stu_id)
-        if sta.need_upload:
-            stu_statistical[l_sta] = "<tr><td>" + student_information.objects.filter(isDelete=False).get(
-                pk=item.stu_id).student_name + ' ' + str(item.add_dt.astimezone(timezone('Asia/Shanghai')))[
-                                               :19]
-            stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], "<div class='carousel slide' id='carousel-" + str(l_sta) + "'>")
-
-            stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<ol class="carousel-indicators">')
-            file_num = len(os.listdir(get_upload_dir()+str(statistics)+'/'+str(item.stu_id)))
-            stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<li class="active" data-slide-to="0" data-target="#carousel-' + str(l_sta) + '"></li>')
-            for file_p in range(1, file_num):
-                stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<li data-slide-to="' + str(file_p) + '" data-target="#carousel-' + str(l_sta) + '"></li>')
-            stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '</ol>')
-            stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<div class="carousel-inner">')
-            if ua == 'weixin':
-                stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<div class="item active"><img alt="" src="/static/upload/'+str(statistics)+'/'+str(item.stu_id)+'/'+os.listdir(get_upload_dir()+str(statistics)+'/'+str(item.stu_id))[0]+'" /></div>')
-                for file_src in os.listdir(get_upload_dir()+str(statistics)+'/'+str(item.stu_id))[1:]:
-                    stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<div class="item"><img alt="" src="/static/upload/'+str(statistics)+'/'+str(item.stu_id)+'/'+file_src+'" /></div>')
+        if sta.need_upload and os.path.exists(get_upload_dir()+str(item.statistics.pk)+'/'+str(item.stu_id)):
+            try:
+                stu_statistical[l_sta] = "<tr><td>" + student_information.objects.filter(isDelete=False).get(pk=item.stu_id).student_name + ' ' + str(item.add_dt.astimezone(timezone('Asia/Shanghai')))[:19]
+                stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], "<div class='carousel slide' id='carousel-" + str(l_sta) + "'>")
+                stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<ol class="carousel-indicators">')
+                file_num = len(os.listdir(get_upload_dir()+str(statistics)+'/'+str(item.stu_id)))
+                stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<li class="active" data-slide-to="0" data-target="#carousel-' + str(l_sta) + '"></li>')
+                for file_p in range(1, file_num):
+                    stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<li data-slide-to="' + str(file_p) + '" data-target="#carousel-' + str(l_sta) + '"></li>')
+                stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '</ol>')
+                stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<div class="carousel-inner">')
+                if ua == 'weixin':
+                    stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<div class="item active"><img alt="" src="/static/upload/'+str(statistics)+'/'+str(item.stu_id)+'/'+os.listdir(get_upload_dir()+str(statistics)+'/'+str(item.stu_id))[0]+'" /></div>')
+                    for file_src in os.listdir(get_upload_dir()+str(statistics)+'/'+str(item.stu_id))[1:]:
+                        stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<div class="item"><img alt="" src="/static/upload/'+str(statistics)+'/'+str(item.stu_id)+'/'+file_src+'" /></div>')
+                else:
+                    stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<div class="item active"><a target="_blank" href="/static/upload/'+str(statistics)+'/'+str(item.stu_id)+'/'+os.listdir(get_upload_dir()+str(statistics)+'/'+str(item.stu_id))[0]+'"><img alt="" src="/static/upload/'+str(statistics)+'/'+str(item.stu_id)+'/'+os.listdir(get_upload_dir()+str(statistics)+'/'+str(item.stu_id))[0]+'" /></a></div>')
+                    for file_src in os.listdir(get_upload_dir()+str(statistics)+'/'+str(item.stu_id))[1:]:
+                        stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<div class="item"><a target="_blank" href="/static/upload/'+str(statistics)+'/'+str(item.stu_id)+'/'+file_src+'"><img alt="" src="/static/upload/'+str(statistics)+'/'+str(item.stu_id)+'/'+file_src+'" /></a></div>')
+                stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], "</div>")
+                stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<a class="left carousel-control" href="#carousel-'+str(l_sta)+'" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></a>')
+                stu_statistical[l_sta] = add_tail(stu_statistical[l_sta],'<a class="right carousel-control" href="#carousel-'+str(l_sta)+'" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></a>')
+                stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], "</tr></td>")
+                stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], "</div>")
+            except IndexError:
+                pass
             else:
-                stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<div class="item active"><a target="_blank" href="/static/upload/'+str(statistics)+'/'+str(item.stu_id)+'/'+os.listdir(get_upload_dir()+str(statistics)+'/'+str(item.stu_id))[0]+'"><img alt="" src="/static/upload/'+str(statistics)+'/'+str(item.stu_id)+'/'+os.listdir(get_upload_dir()+str(statistics)+'/'+str(item.stu_id))[0]+'" /></a></div>')
-                for file_src in os.listdir(get_upload_dir()+str(statistics)+'/'+str(item.stu_id))[1:]:
-                    stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<div class="item"><a target="_blank" href="/static/upload/'+str(statistics)+'/'+str(item.stu_id)+'/'+file_src+'"><img alt="" src="/static/upload/'+str(statistics)+'/'+str(item.stu_id)+'/'+file_src+'" /></a></div>')
-            stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], "</div>")
-            stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], '<a class="left carousel-control" href="#carousel-'+str(l_sta)+'" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></a>')
-            stu_statistical[l_sta] = add_tail(stu_statistical[l_sta],'<a class="right carousel-control" href="#carousel-'+str(l_sta)+'" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></a>')
-            stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], "</tr></td>")
-            stu_statistical[l_sta] = add_tail(stu_statistical[l_sta], "</div>")
+                pass
         else:
-            stu_statistical[l_sta] = "<tr><td>" + student_information.objects.filter(isDelete=False).get(
-                pk=item.stu_id).student_name + str(item.add_dt.astimezone(timezone('Asia/Shanghai')))[
-                                               :19] + "</tr></td>"
-
+            stu_statistical[l_sta] = "<tr><td>" + student_information.objects.filter(isDelete=False).get(pk=item.stu_id).student_name + str(item.add_dt.astimezone(timezone('Asia/Shanghai')))[:19] + "</tr></td>"
+        # print(stu_statistical[l_sta])
     for item in stu_inf_all:
         if item.pk not in stu_reconded:
             if sta.recond_set.all().filter(isDelete=False).filter(stu_id=item.pk).filter(readed=True).exists():
@@ -172,6 +195,7 @@ def get_result_by_sta(statistics, ua):
         'l_unsta': l_unsta,
         'statistical': stu_statistical,
         'unstatistical': stu_unstatistical,
+        'file_tag': sta.need_upload,
     }
     return JsonResponse(sent_dic)
 
@@ -192,10 +216,25 @@ def clear_sta(statistics):
 def add_description(json_str):
     json_str = json.loads(json_str)
     # json_str['description']
+    file_params = json_str['file_params']
+    file_tmp_dir = get_upload_dir() + file_params + '/'
     for item in json_str['statistics']:
         sta_inf = statistics_information.objects.filter(isDelete=False).get(pk=item)
         sta_inf.statistics_description = str(json_str['description']).replace('\n', '<br>')
         sta_inf.save()
+        file_new_dir = get_upload_dir() + str(sta_inf.pk) + '/' + '0' + '/'
+        if os.path.exists(file_tmp_dir):
+            try:
+                os.makedirs(file_new_dir)
+            except FileExistsError:
+                pass
+            else:
+                pass
+            for file_name in os.listdir(file_new_dir):
+                os.remove(file_new_dir + file_name)
+            for file_name in os.listdir(file_tmp_dir):
+                shutil.copyfile(file_tmp_dir + file_name, file_new_dir + file_name)
+    shutil.rmtree(file_tmp_dir)
     return JsonResponse({'status': 'success'})
 
 

@@ -21,6 +21,7 @@ class statistics_information(models.Model):
     statistics_name = models.CharField(max_length=20, default='none')
     statistics_description = models.CharField(max_length=4096)
     need_upload = models.BooleanField(default=False)
+    statistics_inf = models.TextField()
     isDelete = models.BooleanField(default=False)
 
 

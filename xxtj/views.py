@@ -63,6 +63,8 @@ def ajax(request):
     if do == 'query_description_by_statistics':
         statistics = int(request.GET.get('statistics'))
         stu_id = request.GET.get('stu_id', default=0)
+        if stu_id == '':
+            stu_id = 0
         return query_description_by_statistics(statistics, stu_id)
     if do == 'add_recond':
         statistics = int(request.GET.get('statistics'))
@@ -83,7 +85,9 @@ def ajax(request):
     if do == 'check_login_token':
         admin_id = request.GET.get('admin_id')
         token = request.GET.get('token')
-        return  check_login_token(token, admin_id)
+        return check_login_token(token, admin_id)
+    if do == 'print':
+        return HttpResponse(request.GET.get('print'))
 
 
 
@@ -107,22 +111,11 @@ def result(request):
             'title': "统计结果",
             'admin_id': admin_id,
         })
-    elif do == "get_result_by_sta":
-        adm_sta = admin_information.objects.filter(isDelete=False).get(pk=int(admin_id))
-        adm_sta = adm_sta.admin_statistics_set.filter(isDelete=False).all()
-        statistics = {}
-        for items in adm_sta:
-            statistics[items.statistics.pk] = str(
-                items.statistics.statistics_class.name_dis) + items.statistics.statistics_name
-        return render(request, 'xxtj/result_add_description.html', {
-            'admin_id': admin_id,
-            'title': "统计结果",
-            'statistics': statistics,
-        })
     elif do == "add_description":
         adm_sta = admin_information.objects.filter(isDelete=False).get(pk=int(admin_id))
         adm_sta = adm_sta.admin_statistics_set.filter(isDelete=False).all()
         statistics = {}
+
         for items in adm_sta:
             statistics[items.statistics.pk] = str(
                 items.statistics.statistics_class.name_dis) + items.statistics.statistics_name
@@ -130,8 +123,8 @@ def result(request):
             'statistics': statistics,
             'title': "添加说明",
             'admin_id': admin_id,
+            'save_id': hashlib.md5((str(d_tz.now()) + str(admin_id)).encode(encoding='UTF-8')).hexdigest(),
         })
-        pass
 
 
 def file(request):
@@ -143,10 +136,17 @@ def file(request):
         pass
     else:
         pass
-
     for file_num in range(0, int(filenum_sum)):
         f = request.FILES.get('file' + str(file_num))
-        destination = open(upload_dir + request.POST.get("save_id") + '/' + request.POST.get("fileName" + str(file_num)), 'wb+')
+        no_point_flag = True
+        for foo in request.POST.get("fileName" + str(file_num)):
+            if '.' == foo:
+                no_point_flag = False
+        if no_point_flag:
+            file_name = upload_dir + request.POST.get("save_id") + '/' + request.POST.get("fileName" + str(file_num)).replace('%3A','') + ".jpg"
+        else:
+            file_name = upload_dir + request.POST.get("save_id") + '/' + request.POST.get("fileName" + str(file_num))
+        destination = open(file_name, 'wb+')
         for chunk in f.chunks():
             destination.write(chunk)
         destination.close()
