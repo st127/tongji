@@ -1,3 +1,6 @@
+# File:urls.py
+# Copyright(C) OldTaoge 2020.All rights reserved.
+# By GPL v3.0
 """tongji URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:

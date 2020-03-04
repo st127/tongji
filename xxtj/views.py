@@ -1,3 +1,6 @@
+# File:views.py
+# Copyright(C) OldTaoge 2020.All rights reserved.
+# By GPL v3.0
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import *

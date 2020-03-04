@@ -1,3 +1,6 @@
+# File:manage.py
+# Copyright(C) OldTaoge 2020.All rights reserved.
+# By GPL v3.0
 #!/usr/bin/env python
 """Django's command-line utility for administrative tasks."""
 import os

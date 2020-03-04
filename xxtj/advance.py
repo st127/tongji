@@ -1,3 +1,6 @@
+# File:advance.py
+# Copyright(C) OldTaoge 2020.All rights reserved.
+# By GPL v3.0
 from .models import *
 
 # path('advance/cla_inf/', ),

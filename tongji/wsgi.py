@@ -1,3 +1,6 @@
+# File:wsgi.py
+# Copyright(C) OldTaoge 2020.All rights reserved.
+# By GPL v3.0
 """
 WSGI config for tongji project.
 
